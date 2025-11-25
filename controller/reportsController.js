@@ -1,34 +1,25 @@
-
 const express = require('express');
 
-// Models
+// Models (fixed naming)
 const InvoiceModel = require(`${__dirname}/../Models/invoiceModel`);
-const Expense = require(`${__dirname}/../Models/expensesModel`);
-const purchaseModel = require(`${__dirname}/../Models/purchaseModel`);
+const ExpenseModel = require(`${__dirname}/../Models/expensesModel`);
+const PurchaseModel = require(`${__dirname}/../Models/purchaseModel`);
 const Customer = require(`${__dirname}/../Models/customerModel`);
-const supplierModel = require(`${__dirname}/../Models/supplierModel`);
+const SupplierModel = require(`${__dirname}/../Models/supplierModel`);
 const ProductModel = require(`${__dirname}/../Models/productModel`);
 
 
+// ======================= Daily Report =======================
 exports.dailyReport = async (req, res) => {
   try {
-    const { date } = req.query; // YYYY-MM-DD
+    const { date } = req.query;
 
     const start = new Date(date + "T00:00:00");
     const end = new Date(date + "T23:59:59");
 
-    // invoices of that day
-    const invoices = await InvoiceModel.find({
-      createdAt: { $gte: start, $lte: end }
-    });
-
-    const expenses = await Expense.find({
-      createdAt: { $gte: start, $lte: end }
-    });
-
-    const purchases = await purchaseModel.find({
-      createdAt: { $gte: start, $lte: end }
-    });
+    const invoices = await InvoiceModel.find({ createdAt: { $gte: start, $lte: end }});
+    const expenses = await ExpenseModel.find({ createdAt: { $gte: start, $lte: end }});
+    const purchases = await PurchaseModel.find({ createdAt: { $gte: start, $lte: end }});
 
     const totalSales = invoices.reduce((acc, c) => acc + c.totalAfterDiscount, 0);
     const totalPurchases = purchases.reduce((acc, c) => acc + c.totalAfterDiscount, 0);
@@ -49,24 +40,19 @@ exports.dailyReport = async (req, res) => {
     res.status(500).json({ message: "Daily report error", error: error.message });
   }
 };
+
+
+// ======================= Monthly Report =======================
 exports.monthlyReport = async (req, res) => {
   try {
-    const { year, month } = req.query; // month = 1..12
+    const { year, month } = req.query;
 
     const start = new Date(year, month - 1, 1);
     const end = new Date(year, month, 0, 23, 59, 59);
 
-    const invoices = await InvoiceModel.find({
-      createdAt: { $gte: start, $lte: end }
-    });
-
-    const expenses = await Expense.find({
-      createdAt: { $gte: start, $lte: end }
-    });
-
-    const purchases = await purchaseModel.find({
-      createdAt: { $gte: start, $lte: end }
-    });
+    const invoices = await InvoiceModel.find({ createdAt: { $gte: start, $lte: end }});
+    const expenses = await ExpenseModel.find({ createdAt: { $gte: start, $lte: end }});
+    const purchases = await PurchaseModel.find({ createdAt: { $gte: start, $lte: end }});
 
     const totalSales = invoices.reduce((acc, c) => acc + c.totalAfterDiscount, 0);
     const totalPurchases = purchases.reduce((acc, c) => acc + c.totalAfterDiscount, 0);
@@ -88,6 +74,9 @@ exports.monthlyReport = async (req, res) => {
     res.status(500).json({ message: "Monthly report error", error: error.message });
   }
 };
+
+
+// ======================= Yearly Report =======================
 exports.yearlyReport = async (req, res) => {
   try {
     const { year } = req.query;
@@ -95,17 +84,9 @@ exports.yearlyReport = async (req, res) => {
     const start = new Date(year, 0, 1);
     const end = new Date(year, 11, 31, 23, 59, 59);
 
-    const invoices = await InvoiceModel.find({
-      createdAt: { $gte: start, $lte: end }
-    });
-
-    const expenses = await Expense.find({
-      createdAt: { $gte: start, $lte: end }
-    });
-
-    const purchases = await purchaseModel.find({
-      createdAt: { $gte: start, $lte: end }
-    });
+    const invoices = await InvoiceModel.find({ createdAt: { $gte: start, $lte: end }});
+    const expenses = await ExpenseModel.find({ createdAt: { $gte: start, $lte: end }});
+    const purchases = await PurchaseModel.find({ createdAt: { $gte: start, $lte: end }});
 
     const totalSales = invoices.reduce((acc, c) => acc + c.totalAfterDiscount, 0);
     const totalPurchases = purchases.reduce((acc, c) => acc + c.totalAfterDiscount, 0);
@@ -126,47 +107,34 @@ exports.yearlyReport = async (req, res) => {
     res.status(500).json({ message: "Yearly report error", error: error.message });
   }
 };
-// reports to all systems
+
+
+// ======================= System Summary Report =======================
 exports.reports = async (req, res) => {
   try {
     const invoices = await InvoiceModel.find({});
     const customers = await Customer.find({});
-    const purchases = await purchaseModel.find({});
-    const suppliers = await supplierModel.find({});
+    const purchases = await PurchaseModel.find({});
+    const suppliers = await SupplierModel.find({});
     const products = await ProductModel.find({});
-    const expenses = await Expense.find({});
+    const expenses = await ExpenseModel.find({});
 
-    const invoicesLength = invoices.length;
-    const customersLength = customers.length;
-    const purchasesLength = purchases.length;
-    const suppliersLength = suppliers.length;
-    const productsLength = products.length;
+    const summary = {
+      invoicesLength: invoices.length,
+      customersLength: customers.length,
+      purchasesLength: purchases.length,
+      suppliersLength: suppliers.length,
+      productsLength: products.length,
 
-    // Total Expenses
-    const totalExpenses = expenses.reduce((acc, curr) => acc + curr.amount, 0);
+      totalSales: invoices.reduce((acc, curr) => acc + curr.totalAfterDiscount, 0),
+      totalPurchases: purchases.reduce((acc, curr) => acc + curr.totalAfterDiscount, 0),
+      totalExpenses: expenses.reduce((acc, curr) => acc + curr.amount, 0)
+    };
 
-    // Total Sales 
-    const totalSales = invoices.reduce((acc, curr) => acc + curr.totalAfterDiscount, 0);
+    summary.totalProfit =
+      summary.totalSales - summary.totalPurchases - summary.totalExpenses;
 
-    // Total Purchases
-    const totalPurchases = purchases.reduce((acc, curr) => acc + curr.totalAfterDiscount, 0);
-
-    // Profit
-    const totalProfit = totalSales - totalPurchases - totalExpenses;
-
-    return res.status(200).json({
-      summary: {
-        invoicesLength,
-        customersLength,
-        purchasesLength,
-        suppliersLength,
-        productsLength,
-        totalSales,
-        totalPurchases,
-        totalExpenses,
-        totalProfit
-      }
-    });
+    return res.status(200).json({ summary });
 
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
