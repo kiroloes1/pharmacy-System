@@ -24,5 +24,3 @@ router.put("/addToSupplierBalance/:id", supplierController.addToSupplierBalance)
 
 
 module.exports = router;
-
-

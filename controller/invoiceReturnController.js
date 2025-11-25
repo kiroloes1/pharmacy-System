@@ -17,7 +17,7 @@ exports.getAllReturnInvoices = async (req, res) => {
         });
 
     } catch (err) {
-        return res.status(500).json({ message: "server error" });
+        return res.status(500).json({ message: "server error"+err.message });
     }
 };
 

@@ -2,31 +2,38 @@ const Product = require(`${__dirname}/../Models/productModel`);
 
 // Get all products
 exports.getAllProducts = async (req, res) => {
-    try {
-        const now = new Date();
-        const fourMonthsLater = new Date();
-        fourMonthsLater.setMonth(fourMonthsLater.getMonth() + 4);
+  try {
+    const now = new Date();
+    const fourMonthsLater = new Date();
+    fourMonthsLater.setMonth(fourMonthsLater.getMonth() + 4);
 
-        // جلب كل المنتجات مع المورد
-        const products = await Product.find().populate("supplierId");
+    // جلب كل المنتجات مع المورد
+    const products = await Product.find().populate("supplierId");
 
-        // تعيين IsNearlyExpired لكل منتج
-        const updatedProducts = products.map(product => {
-            const expDate = new Date(product.expiration);
-            product.IsNearlyExpired = (expDate >= now && expDate <= fourMonthsLater || expDate < now);
-            return product;
-        });
+    // تعيين IsNearlyExpired لكل منتج
+    const updatedProducts = products.map(product => {
+      const expDate = new Date(product.expiration);
 
-        return res.status(200).json({
-            message: "success",
-            results: updatedProducts.length,
-            data: updatedProducts
-        });
+      // المنتج منتهي الصلاحية أو قرب انتهاء الصلاحية خلال 4 أشهر
+      if (expDate < now || (expDate >= now && expDate <= fourMonthsLater)) {
+        product.IsNearlyExpired = true;
+      } else {
+        product.IsNearlyExpired = false;
+      }
 
-    } catch (e) {
-        console.log("error: " + e);
-        res.status(500).json({ message: "server error" });
-    }
+      return product;
+    });
+
+    return res.status(200).json({
+      message: "success",
+      results: updatedProducts.length,
+      data: updatedProducts
+    });
+
+  } catch (e) {
+    console.log("error: " + e);
+    res.status(500).json({ message: "server error" });
+  }
 };
 
 
@@ -218,5 +225,4 @@ exports.getExpiredProducts = async (req, res) => {
         res.status(500).json({ message: "server error" });
     }
 };
-
 

@@ -14,6 +14,10 @@ const expensesSchema=mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  note:{
+    type:String,
+       required:true,
+  }
 });
 const expenseModel=mongoose.model("Expense",expensesSchema);
 module.exports=expenseModel;

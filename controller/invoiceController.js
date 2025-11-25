@@ -5,7 +5,7 @@ const InvoiceModel = require(`${__dirname}/../Models/invoiceModel`);
 const Customer = require(`${__dirname}/../Models/customerModel`);
 const invoiceReturnModel = require(`${__dirname}/../Models/invoiceReturnModel`);
 const ProductModel = require(`${__dirname}/../Models/productModel`);
-
+const ExpenseModel=require(`${__dirname}/../Models/expensesModel`)
 
 // Get invoice by id
 exports.getInvoice = async (req, res) => {
@@ -37,7 +37,7 @@ exports.getInvoice = async (req, res) => {
 // Get all invoices
 exports.getAllInvoice = async (req, res) => {
     try {
-        const invoices = await InvoiceModel.find()
+        const invoices = await InvoiceModel.find({return:false})
              .populate("customerId")
         .populate({
             path:"products.productId",
@@ -140,11 +140,13 @@ if (oldInvoice && updatedInvoice && oldInvoice.remaining !== updatedInvoice.rema
 };
 
 // return invoices
+
 exports.returnInvoice = async (req, res) => {
   try {
     const invoiceId = req.params.id;
     const { returnProducts, returnReason } = req.body;
 
+    // 1) جلب الفاتورة
     const invoice = await InvoiceModel.findById(invoiceId);
     if (!invoice) {
       return res.status(404).json({ message: "Invoice not found" });
@@ -156,6 +158,7 @@ exports.returnInvoice = async (req, res) => {
 
     let totalReturned = 0;
 
+    // 2) تحقق من كمية المرتجع لكل منتج
     for (let rp of returnProducts) {
       const productInInvoice = invoice.products.find(
         p => p.productId.toString() === rp.productId.toString()
@@ -173,60 +176,68 @@ exports.returnInvoice = async (req, res) => {
         });
       }
 
-      // إعادة الكمية للمخزون
+      // 3) إعادة الكمية للمخزون
       await ProductModel.findByIdAndUpdate(rp.productId, {
         $inc: { quantity: rp.qty }
       });
 
-      // حساب قيمة المرتجع بعد الخصم
-      totalReturned +=
-        productInInvoice.unitPrice *
-        rp.qty *
-        (100 - invoice.discount) /
-        100;
+      // 4) حساب قيمة المرتجع بعد الخصم
+      const unitPrice = Number(productInInvoice.unitPrice || 0);
+      const discount = Number(invoice.discount || 0);
+      const returnedValue = unitPrice * rp.qty * (100 - discount) / 100;
 
-      // تحديث كمية الفاتورة
+      totalReturned += returnedValue;
+
+      // 5) تحديث كمية الفاتورة
       productInInvoice.quantity -= rp.qty;
     }
 
-    // إزالة المنتجات التي أصبحت كميتها صفر
+    // 6) إزالة المنتجات التي أصبحت كميتها صفر
     invoice.products = invoice.products.filter(p => p.quantity > 0);
 
+    // 7) تحديث القيم المالية للفاتورة
     if (invoice.products.length === 0) {
       invoice.return = true;
-      invoice.remaining = 0;
       invoice.total = 0;
       invoice.totalAfterDiscount = 0;
+      invoice.remaining = 0;
     } else {
-      invoice.total = invoice.products.reduce((sum, p) => sum + p.unitPrice * p.quantity, 0);
+      invoice.total = invoice.products.reduce((sum, p) => {
+        const unitPrice = Number(p.unitPrice || 0);
+        const quantity = Number(p.quantity || 0);
+        return sum + unitPrice * quantity;
+      }, 0);
 
-      invoice.totalAfterDiscount =
-        invoice.total - (invoice.discount * invoice.total) / 100;
+      const discount = Number(invoice.discount || 0);
+      const paid = Number(invoice.paid || 0);
 
-      // correct: remaining = totalAfterDiscount - paid
-      invoice.remaining = invoice.totalAfterDiscount - invoice.paid;
+      invoice.totalAfterDiscount = invoice.total - (discount * invoice.total) / 100;
+      invoice.remaining = invoice.totalAfterDiscount - paid;
     }
 
     await invoice.save();
 
-    // تحديث رصيد العميل
+    // 8) تحديث رصيد العميل
     await Customer.findByIdAndUpdate(invoice.customerId, {
-      $inc: { remainingBalance: -totalReturned }
+      $inc: { remainingBalance: -totalReturned },
+      $push: { invoicesReturn: [] } // مؤقتاً إذا لم يكن موجود في النموذج
     });
 
-    // إنشاء سجل الإرجاع
+    // 9) إنشاء سجل الإرجاع
     const returnInvoice = await invoiceReturnModel.create({
       invoiceId: invoice._id,
       customerId: invoice.customerId,
       products: returnProducts.map(rp => ({
         productId: rp.productId,
-        qty: rp.qty
+        qty: rp.qty,
+        sellPrice: Number(rp.sellPrice || 0)
       })),
       totalReturned: totalReturned,
       reason: returnReason || "No reason provided",
       returnDate: new Date()
     });
 
+    // ربط سجل الإرجاع بالعميل
     await Customer.findByIdAndUpdate(invoice.customerId, {
       $push: { invoicesReturn: returnInvoice._id }
     });
@@ -242,7 +253,6 @@ exports.returnInvoice = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
-
 // producrs is more sell
 exports.bestSellers = async (req, res) => {
   try {
@@ -291,3 +301,32 @@ exports.bestSellers = async (req, res) => {
   }
 };
 
+// benfit
+exports.benefit = async (req, res) => {
+  try {
+    // Get all invoices
+    const invoiceData = await InvoiceModel.find();
+
+    // Sum of totalAfterDiscount
+    const totalRevenue = invoiceData.reduce((acc, curr) => acc + curr.totalAfterDiscount, 0);
+
+    // Get all expenses
+    const expenses = await ExpenseModel.find();
+
+    // Sum of all expenses
+    const totalExpenses = expenses.reduce((acc, curr) => acc + curr.amount, 0);
+
+    // Calculate profit
+    const totalProfit = totalRevenue - totalExpenses;
+
+    // Send response
+    res.status(200).json({
+      totalRevenue,
+      totalExpenses,
+      totalProfit
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: "Server error: " + err.message });
+  }
+};

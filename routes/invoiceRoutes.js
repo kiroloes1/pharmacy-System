@@ -22,6 +22,9 @@ router.use(restrictTo("admin"));
 // update invoice
 router.patch("/editInvoice/:id", invoiceController.editInvoice);
 
+router.get("/benfit", invoiceController.benefit);
+
+
 
 // Create new invoice
 router.post("/", invoiceController.createInvoice);

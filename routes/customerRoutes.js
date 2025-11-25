@@ -35,7 +35,3 @@ router.put("/addToCustomerBalance/:id", customerController.addToCustomerBalance)
 
 
 module.exports = router;
-
-
-
-

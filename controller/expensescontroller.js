@@ -33,7 +33,7 @@ exports.getExpenseById = async (req, res) => {
 //  CREATE expense 
 exports.createExpense = async (req, res) => {
   try {
-    const { amount, User } = req.body;
+    const { amount, User,note } = req.body;
 
     if (!amount || !User) {
       return res.status(400).json({ message: "Amount and User are required" });
@@ -42,6 +42,7 @@ exports.createExpense = async (req, res) => {
     const newExpense = await Expense.create({
       amount,
       User,
+      note,
       Date: Date.now()
     });
 

@@ -235,6 +235,7 @@ exports.returnPurchase = async (req, res) => {
       reason: returnReason || "No reason provided",
       createdAt: new Date()
     });
+    
 
     // 5) Update purchase products quantities
     purchase.products.forEach(p => {

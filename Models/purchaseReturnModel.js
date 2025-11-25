@@ -1,7 +1,18 @@
 const mongoose = require("mongoose");
 
-const purchaseReturnSchema = new mongoose.Schema({
+const purchaseInvoiceSchema = new mongoose.Schema({
 
+    purchaseId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Purchase",   // هنا الاسم يجب أن يكون نفس اسم الموديل
+        required: true
+    },
+
+    supplierId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "supplier",  // هنا الاسم يجب أن يكون نفس اسم الموديل
+        required: true
+    },
 
     products: [
         {
@@ -12,19 +23,24 @@ const purchaseReturnSchema = new mongoose.Schema({
             },
             qty: { type: Number, required: true },
             sellPrice: { type: Number, required: true },
-        
+           
         }
     ],
 
-    reason: {
-        type: String,
-        default: "No reason provided"
-    },
+
 
     createdAt: {
         type: Date,
         default: Date.now
     }
+    ,
+    reason:{
+        type:String,
+    }
+
 });
 
-module.exports = mongoose.model("PurchaseReturn", purchaseReturnSchema);
+// مثال على استخدام populate
+// PurchaseInvoiceModel.find().populate("purchaseId").populate("supplierId");
+
+module.exports = mongoose.model("PurchaseInvoice", purchaseInvoiceSchema);

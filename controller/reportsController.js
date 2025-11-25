@@ -1,3 +1,15 @@
+
+const express = require('express');
+
+// Models
+const InvoiceModel = require(`${__dirname}/../Models/invoiceModel`);
+const Expense = require(`${__dirname}/../Models/expensesModel`);
+const purchaseModel = require(`${__dirname}/../Models/purchaseModel`);
+const Customer = require(`${__dirname}/../Models/customerModel`);
+const supplierModel = require(`${__dirname}/../Models/supplierModel`);
+const ProductModel = require(`${__dirname}/../Models/productModel`);
+
+
 exports.dailyReport = async (req, res) => {
   try {
     const { date } = req.query; // YYYY-MM-DD
