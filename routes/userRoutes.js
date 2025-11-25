@@ -20,7 +20,7 @@ router.get("/", userController.getAllUsers);
 // Get user by ID
 router.get("/getUserById/:id", userController.getUserById);
 
-
+router.put("/:id", userController.BlockUser);
 
 
 // update user
@@ -31,3 +31,4 @@ router.delete("/:id", userController.deleteUser);
 
 
 module.exports = router;
+
