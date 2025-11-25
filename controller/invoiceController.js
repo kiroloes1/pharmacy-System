@@ -147,9 +147,7 @@ exports.returnInvoice = async (req, res) => {
 
     // 1) Get invoice
     const invoice = await InvoiceModel.findById(invoiceId);
-    if (!invoice) {
-      return res.status(404).json({ message: "Invoice not found" });
-    }
+    if (!invoice) return res.status(404).json({ message: "Invoice not found" });
 
     if (!invoice.products || invoice.products.length === 0) {
       return res.status(400).json({ message: "Invoice has no products" });
@@ -163,29 +161,21 @@ exports.returnInvoice = async (req, res) => {
         (p) => p.productId.toString() === rp.productId.toString()
       );
 
-      if (!productInInvoice) {
-        return res.status(400).json({
-          message: `Product ${rp.productId} not found in invoice`
-        });
-      }
+      if (!productInInvoice)
+        return res.status(400).json({ message: `Product ${rp.productId} not found in invoice` });
 
-      if (rp.qty > productInInvoice.quantity) {
+      if (rp.qty > productInInvoice.quantity)
         return res.status(400).json({
           message: `Return quantity (${rp.qty}) exceeds purchased quantity (${productInInvoice.quantity})`
         });
-      }
 
       // 3) Return qty back to stock
-      await ProductModel.findByIdAndUpdate(rp.productId, {
-        $inc: { quantity: rp.qty }
-      });
+      await ProductModel.findByIdAndUpdate(rp.productId, { $inc: { quantity: rp.qty } });
 
       // 4) Calculate value after discount
       const unitPrice = Number(productInInvoice.unitPrice || 0);
       const discount = Number(invoice.discount || 0);
-
-      const returnedValue =
-        unitPrice * rp.qty * (100 - discount) / 100;
+      const returnedValue = unitPrice * rp.qty * (100 - discount) / 100;
 
       totalReturned += returnedValue;
 
@@ -203,27 +193,21 @@ exports.returnInvoice = async (req, res) => {
       invoice.totalAfterDiscount = 0;
       invoice.remaining = 0;
     } else {
-      invoice.total = invoice.products.reduce((sum, p) => {
-        return sum + (p.unitPrice * p.quantity);
-      }, 0);
-
+      invoice.total = invoice.products.reduce((sum, p) => sum + (p.unitPrice * p.quantity), 0);
       const discount = Number(invoice.discount || 0);
       const paid = Number(invoice.paid || 0);
-
-      invoice.totalAfterDiscount =
-        invoice.total - (discount * invoice.total) / 100;
-
+      invoice.totalAfterDiscount = invoice.total - (discount * invoice.total) / 100;
       invoice.remaining = invoice.totalAfterDiscount - paid;
     }
 
     await invoice.save();
 
-    // 8) Update customer balance
+    // 8) Update customer balance directly
     await Customer.findByIdAndUpdate(invoice.customerId, {
-      $inc: { remainingBalance: -totalReturned }
+      $inc: { remainingBalance: -totalReturned }  // يقلل رصيد العميل
     });
 
-    // 9) Create return record
+    // 9) Create return record (اختياري لو عايز بس لسجل المرتجع)
     const returnInvoice = await invoiceReturnModel.create({
       invoiceId: invoice._id,
       customerId: invoice.customerId,
@@ -237,11 +221,6 @@ exports.returnInvoice = async (req, res) => {
       returnDate: new Date()
     });
 
-    // Add reference to customer
-    await Customer.findByIdAndUpdate(invoice.customerId, {
-      $push: { invoicesReturn: returnInvoice._id }
-    });
-
     return res.status(200).json({
       message: "Invoice returned successfully",
       returnInvoice,
@@ -250,12 +229,10 @@ exports.returnInvoice = async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    return res.status(500).json({
-      message: "Server error",
-      error: err.message
-    });
+    return res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
 
 // producrs is more sell
 exports.bestSellers = async (req, res) => {
@@ -334,6 +311,7 @@ exports.benefit = async (req, res) => {
     res.status(500).json({ message: "Server error: " + err.message });
   }
 };
+
 
 
 
