@@ -184,7 +184,7 @@ exports.returnInvoice = async (req, res) => {
       });
 
       // 4) حساب قيمة المرتجع بعد الخصم
-      const unitPrice = Number(productInInvoice.unitPrice || 0);
+      const unitPrice = Number(productInInvoice.unitPrice || productInInvoice.sellPrice || 0);
       const discount = Number(invoice.discount || 0);
 
       const returnedValue = unitPrice * returnQty * (100 - discount) / 100;
@@ -199,7 +199,7 @@ exports.returnInvoice = async (req, res) => {
 
     // 7) إعادة حساب القيم المالية
     const total = invoice.products.reduce((sum, p) => {
-      const unitPrice = Number(p.unitPrice || 0);
+      const unitPrice = Number(p.unitPrice || p.sellPrice ||  0);
       const quantity = Number(p.quantity || 0);
       return sum + unitPrice * quantity;
     }, 0);
@@ -232,7 +232,7 @@ exports.returnInvoice = async (req, res) => {
       products: returnProducts.map((rp) => ({
         productId: rp.productId,
         qty: Number(rp.qty || 0),
-        sellPrice: Number(rp.sellPrice || 0)
+        sellPrice: Number(rp.sellPrice || rp.unitPrice|| 0)
       })),
       totalReturned,
       reason: returnReason || "No reason provided",
@@ -333,6 +333,7 @@ exports.benefit = async (req, res) => {
     res.status(500).json({ message: "Server error: " + err.message });
   }
 };
+
 
 
 
