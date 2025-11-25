@@ -35,7 +35,7 @@ const productSchema=new mongoose.Schema({
     IsNearlyExpired:{
         type:Boolean,
         default:false,
-    }
+    },
 
 
 
@@ -45,3 +45,4 @@ const products=mongoose.model("Products",productSchema);
 
 
 module.exports=products;
+
