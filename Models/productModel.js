@@ -31,11 +31,17 @@ const productSchema=new mongoose.Schema({
     expiration:{
         type:Date,
         required:true,
+    },
+    IsNearlyExpired:{
+        type:Boolean,
+        default:false,
     }
+
 
 
 });
 const products=mongoose.model("Products",productSchema);
+
 
 
 module.exports=products;
