@@ -21,14 +21,8 @@ const reportRouter = require(`${__dirname}/routes/reportRoutes`);
 
 const cors = require("cors");
 
-// السماح لكل الدومينات
-app.use(cors());
 
-// أو السماح بدومين محدد (الأفضل للأمان)
-app.use(cors({
-  origin: "https://pharmacy-system-kero.web.app",
-  methods: ["GET","POST","PUT","DELETE"]
-}));
+app.use(cors()); // يسمح لأي دومين
 
 app.use(express.json());
 
@@ -51,4 +45,5 @@ app.use(errorHandler);
 app.listen(port, () => {
   console.log("Server running on port", port);
 });
+
 
