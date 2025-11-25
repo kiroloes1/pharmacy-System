@@ -16,6 +16,7 @@ const userRouter=require(`${__dirname}/routes/userRoutes`);
 const PurchasesReturn=require(`${__dirname}/routes/PurchaseReturnRoutes`);
 const InvoicesReturn=require(`${__dirname}/routes/invoiceReturnRoutes`);
 const Expenses=require(`${__dirname}/routes/expenseRoutes`);
+const reportRouter = require(`${__dirname}/routes/reportRoutes`);
 
 
 
@@ -41,6 +42,7 @@ app.use("/v1/Purchases",purchaseRouter);
 app.use("/v1/PurchasesReturn",PurchasesReturn);
 app.use("/v1/InvoicesReturn",InvoicesReturn);
 app.use("/v1/Expenses",Expenses);
+app.use("/v1/reports", reportRouter);
 
 
 
@@ -52,5 +54,6 @@ app.listen(port,()=>{
     console.log(`Server running on port ${port}`);
 
 })
+
 
 
