@@ -20,11 +20,14 @@ const Expenses=require(`${__dirname}/routes/expenseRoutes`);
 
 
 const cors = require("cors");
-app.use(cors({
-  origin: "*" // العنوان اللي شغال عليه React
-  credentials: true
-}));
 
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://localhost:5173"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+  })
+);
 
 app.use(express.json());
 
@@ -49,3 +52,4 @@ app.listen(port,()=>{
     console.log(`Server running on port ${port}`);
 
 })
+
