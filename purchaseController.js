@@ -179,25 +179,18 @@ exports.editPurchase = async (req, res) => {
   }
 };
 
-
 // return purchase (partial or full)
 exports.returnPurchase = async (req, res) => {
   try {
     const purchaseId = req.params.id;
     const { returnProducts, returnReason } = req.body;
 
-    if (!returnProducts || returnProducts.length === 0) {
-      return res.status(400).json({ message: "No returned products provided" });
-    }
-
     // 1) Get original purchase
     const purchase = await PurchaseModel.findById(purchaseId);
     if (!purchase) return res.status(404).json({ message: "Purchase not found" });
 
     if (!purchase.products || purchase.products.length === 0) {
-      return res.status(400).json({
-        message: "This purchase has no products, cannot return"
-      });
+      return res.status(400).json({ message: "This purchase has no products, cannot return" });
     }
 
     // 2) Validate returned quantities
@@ -218,11 +211,11 @@ exports.returnPurchase = async (req, res) => {
         });
       }
 
-      // load price from original purchase if not provided
+      // load price from purchase invoice if not provided
       rp.price = rp.price || original.unitPrice;
     }
 
-    // 3) Update stock (- returned qty)
+    // 3) Update stock
     for (let rp of returnProducts) {
       await ProductModel.findByIdAndUpdate(rp.productId, {
         $inc: { quantity: -rp.qty }
@@ -242,20 +235,19 @@ exports.returnPurchase = async (req, res) => {
       reason: returnReason || "No reason provided",
       createdAt: new Date()
     });
+    
 
-    // 5) Update purchase quantities
+    // 5) Update purchase products quantities
     purchase.products.forEach(p => {
-      const returned = returnProducts.find(
-        rp => rp.productId.toString() === p.productId.toString()
-      );
+      const returned = returnProducts.find(rp => rp.productId.toString() === p.productId.toString());
       if (returned) p.quantity -= returned.qty;
     });
 
-    // remove products that reached zero qty
+    // remove any product that became zero
     purchase.products = purchase.products.filter(p => p.quantity > 0);
 
     if (purchase.products.length === 0) {
-      purchase.return = true; // full return
+      purchase.return = true;
     }
 
     // 6) Recalculate totals
