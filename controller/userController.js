@@ -110,7 +110,7 @@ exports.createNewUser = async (req, res) => {
         }
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newUser = await User.create({
+        let newUser = await User.create({
             name,
             email,
             password: hashedPassword,
@@ -223,5 +223,6 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json({ message: "server error" });
     }
 };
+
 
 
