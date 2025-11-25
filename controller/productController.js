@@ -3,13 +3,24 @@ const Product = require(`${__dirname}/../Models/productModel`);
 // Get all products
 exports.getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find()
-        .populate("supplierId")
+        const now = new Date();
+        const fourMonthsLater = new Date();
+        fourMonthsLater.setMonth(fourMonthsLater.getMonth() + 4);
 
-        res.status(200).json({
+        // جلب كل المنتجات مع المورد
+        const products = await Product.find().populate("supplierId");
+
+        // تعيين IsNearlyExpired لكل منتج
+        const updatedProducts = products.map(product => {
+            const expDate = new Date(product.expiration);
+            product.IsNearlyExpired = (expDate >= now && expDate <= fourMonthsLater);
+            return product;
+        });
+
+        return res.status(200).json({
             message: "success",
-            results: products.length,
-            data: products
+            results: updatedProducts.length,
+            data: updatedProducts
         });
 
     } catch (e) {
@@ -17,6 +28,7 @@ exports.getAllProducts = async (req, res) => {
         res.status(500).json({ message: "server error" });
     }
 };
+
 
 // Get product by ID
 exports.getProductById = async (req, res) => {
@@ -65,6 +77,33 @@ exports.filterProduct = async (req, res) => {
     res.status(500).json({ message: `Error: ${error.message}` });
   }
 };
+
+// Search products
+exports.searchProducts = async (req, res) => {
+  try {
+    const search = req.query.search || "";
+
+    const products = await ProductModel.find({
+      $or: [
+        { name: { $regex: search, $options: "i" } },
+        { companyName: { $regex: search, $options: "i" } },
+        { barcode: { $regex: search, $options: "i" } }
+      ]
+    })
+    .limit(30)
+    .select("name companyName sellPrice purchasePrice quantity");
+
+    res.status(200).json({
+      status: "success",
+      results: products.length,
+      data: products
+    });
+
+  } catch (err) {
+    res.status(500).json({ status: "error", message: err.message });
+  }
+};
+
 
 // Create new product
 exports.createProduct = async (req, res) => {
@@ -149,3 +188,34 @@ exports.deleteProduct = async (req, res) => {
         res.status(500).json({ message: "server error" });
     }
 };
+
+exports.getExpiredProducts = async (req, res) => {
+    try {
+        const now = new Date();
+
+     const productsNearlyExpired = await Product.find({
+    $or: [
+        {
+            expiration: {
+                $gte: now,
+                $lte: fourMonthsLater
+            }
+        },
+        {
+            expiration: {
+                $lt: now
+            }
+        }
+    ]
+});
+
+
+        res.status(200).json({
+            message: "success",
+            productsNearlyExpired: productsNearlyExpired
+        });
+    } catch (error) {
+        res.status(500).json({ message: "server error" });
+    }
+};
+

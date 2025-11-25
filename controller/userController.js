@@ -67,9 +67,13 @@ exports.userLogin = async (req, res) => {
     // disActive all User
     await User.updateMany({}, { $set: { active: false } });
 
-    // active the logging user
-    existUser.active = true;
-    await existUser.save();
+// Activate current user
+existUser.active = true;
+await existUser.save();
+
+// Fetch fresh document
+existUser = await User.findByIdAndUpdate(existUser._id);
+
 
     res.status(200).json({
       message: 'User logged in successfully',
@@ -120,6 +124,9 @@ exports.createNewUser = async (req, res) => {
         // active the logging user
         newUser.active = true;
         await newUser.save();
+              
+       newUser = await User.findByIdAndUpdate(newUser._id);
+
 
         res.status(201).json({
             message: "user created successfully",

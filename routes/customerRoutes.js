@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const customerController = require(`${__dirname}/../controller/CustomerController`);
+const customerController = require(`${__dirname}/../controller/customerController`);
 const { protect, restrictTo } = require(`${__dirname}/../middleWare/authMiddleware`);
 
 // أي حد عامل login يقدر يشوف البيانات
@@ -35,6 +35,3 @@ router.put("/addToCustomerBalance/:id", customerController.addToCustomerBalance)
 
 
 module.exports = router;
-
-
-

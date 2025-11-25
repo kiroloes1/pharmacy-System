@@ -127,41 +127,62 @@ exports.FilterSupplier=async(req,res)=>{
 exports.collection = async (req, res) => {
   try {
     const id = req.params.id;
-    let { collectionPaid } = req.body;
+    let { collectionPaid, typeCollection } = req.body;
 
     if (collectionPaid <= 0) {
       return res.status(400).json({ message: "Please enter a valid amount" });
     }
 
-    const supplier = await suppliersModel.findById(id).populate("purchases");
+    const supplier = await suppliersModel.findById(id).populate({
+      path: "purchases",
+      options: { sort: { createdAt: 1 } }
+    });
+
     if (!supplier) {
       return res.status(404).json({ message: "Supplier not found" });
     }
 
+    // تحويل المبلغ لرقم صحيح
+    let remainingPayment = Math.round(collectionPaid);
 
-    await suppliersModel.findByIdAndUpdate(id, { $inc: { remainingBalance: -collectionPaid } 
-      ,  $push: { payments: { amount: collectionPaid } }});
-
-    let remainingPayment = collectionPaid;
+    // تحديث رصيد المورد والمدفوعات
+    const updateBalance = typeCollection === "out" ? remainingPayment : -remainingPayment;
+    await suppliersModel.findByIdAndUpdate(id, {
+      $inc: { remainingBalance: updateBalance },
+      $push: { payments: { amount: remainingPayment, typeCollection } }
+    });
 
     for (let purchase of supplier.purchases) {
-      if (purchase.remaining >= remainingPayment) {
-        await purachaseModel.findByIdAndUpdate(purchase._id, { $inc: { remaining: -remainingPayment } });
+      if (remainingPayment <= 0) break;
+
+      // تحويل القيم لرقم صحيح لتجنب الكسور
+      let purchaseRemaining = Math.round(purchase.remaining);
+      
+      if (purchaseRemaining >= remainingPayment) {
+        await purachaseModel.findByIdAndUpdate(purchase._id, {
+          $inc: { remaining: -remainingPayment, paid: remainingPayment }
+        });
         remainingPayment = 0;
         break;
       } else {
-        remainingPayment -= purchase.remaining;
-        await purachaseModel.findByIdAndUpdate(purchase._id, { $set: { remaining: 0 } });
+        remainingPayment -= purchaseRemaining;
+        await purachaseModel.findByIdAndUpdate(purchase._id, {
+          $set: { remaining: 0 },
+          $inc: { paid: purchaseRemaining }
+        });
       }
     }
 
-    res.status(200).json({ message: "Collection applied successfully" });
+    res.status(200).json({
+      message: "Collection applied successfully and updated supplier invoices"
+    });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
 
 // Create new supplier
 exports.createNewSupplier = async (req, res) => {

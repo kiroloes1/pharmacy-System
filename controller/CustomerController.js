@@ -143,15 +143,15 @@ exports.updateCustomer = async (req, res) => {
 };
 
 // collection from customer
-exports.collection= async (req, res) => {
+exports.collection = async (req, res) => {
   try {
     const id = req.params.id;
-    let { collectionPaid ,typeCollection} = req.body;
+    let { collectionPaid, typeCollection } = req.body;
 
     if (collectionPaid <= 0) {
       return res.status(400).json({ message: "Please enter a valid amount" });
     }
-    if(typeCollection!="in" ||typeCollection!= "out"){
+    if (typeCollection !== "in" && typeCollection !== "out") {
       return res.status(400).json({ message: "Please enter a valid typeCollection" });
     }
 
@@ -161,21 +161,41 @@ exports.collection= async (req, res) => {
       return res.status(404).json({ message: "Customer not found" });
     }
 
-    if(typeCollection=="out"){
-          // if out this is maney out from system to client 
-    await customersModel.findByIdAndUpdate(id, { $inc: { remainingBalance: collectionPaid }
-  ,   $push: { payments: { amount: collectionPaid ,typeCollection:"out"  } }
-    });
-    }else{
-                        // if out this is maney in from  client to system  
-    await customersModel.findByIdAndUpdate(id, { $inc: { remainingBalance: -collectionPaid }
-  ,   $push: { payments: { amount: collectionPaid , typeCollection:"in"} }
-    });
+    if (typeCollection === "out") {
+      // صرف للعميل (مال خارج من النظام للعميل)
+      await customersModel.findByIdAndUpdate(id, {
+        $inc: { remainingBalance: collectionPaid },
+        $push: { payments: { amount: collectionPaid, typeCollection: "out", date: new Date() } }
+      });
+    } else {
+      // قبض من العميل (مال وارد من العميل للنظام)
+      await customersModel.findByIdAndUpdate(id, {
+        $inc: { remainingBalance: -collectionPaid },
+        $push: { payments: { amount: collectionPaid, typeCollection: "in", date: new Date() } }
+      });
+
+      // تحديث كل الفواتير المفتوحة حسب المبلغ
+      let remainingPayment = collectionPaid;
+      for (let invoice of customer.invoices) {
+        if (invoice.remaining >= remainingPayment) {
+          await InvoiceModel.findByIdAndUpdate(invoice._id, { 
+            $inc: { 
+              remaining: -remainingPayment, 
+              paid: remainingPayment 
+            } 
+          });
+          remainingPayment = 0;
+          break;
+        } else {
+          const currentRemaining = invoice.remaining;
+          remainingPayment -= currentRemaining;
+          await InvoiceModel.findByIdAndUpdate(invoice._id, { 
+            $set: { remaining: 0 }, 
+            $inc: { paid: currentRemaining } 
+          });
+        }
+      }
     }
-
-
- 
-
 
     res.status(200).json({ message: "Collection applied successfully to customer" });
 
@@ -184,6 +204,7 @@ exports.collection= async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
 
 // // debt to customer
 exports.addToCustomerBalance = async (req, res) => {

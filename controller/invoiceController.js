@@ -179,7 +179,11 @@ exports.returnInvoice = async (req, res) => {
       });
 
       // حساب قيمة المرتجع بعد الخصم
-      totalReturned += productInInvoice.unitPrice * rp.qty * (100 - invoice.discount) / 100;
+      totalReturned +=
+        productInInvoice.unitPrice *
+        rp.qty *
+        (100 - invoice.discount) /
+        100;
 
       // تحديث كمية الفاتورة
       productInInvoice.quantity -= rp.qty;
@@ -191,10 +195,16 @@ exports.returnInvoice = async (req, res) => {
     if (invoice.products.length === 0) {
       invoice.return = true;
       invoice.remaining = 0;
+      invoice.total = 0;
+      invoice.totalAfterDiscount = 0;
     } else {
       invoice.total = invoice.products.reduce((sum, p) => sum + p.unitPrice * p.quantity, 0);
-      invoice.totalAfterDiscount = invoice.total - (invoice.discount * invoice.total) / 100;
-      invoice.remaining -= invoice.totalAfterDiscount ;
+
+      invoice.totalAfterDiscount =
+        invoice.total - (invoice.discount * invoice.total) / 100;
+
+      // correct: remaining = totalAfterDiscount - paid
+      invoice.remaining = invoice.totalAfterDiscount - invoice.paid;
     }
 
     await invoice.save();
@@ -208,10 +218,17 @@ exports.returnInvoice = async (req, res) => {
     const returnInvoice = await invoiceReturnModel.create({
       invoiceId: invoice._id,
       customerId: invoice.customerId,
-      products: returnProducts,
+      products: returnProducts.map(rp => ({
+        productId: rp.productId,
+        qty: rp.qty
+      })),
       totalReturned: totalReturned,
       reason: returnReason || "No reason provided",
       returnDate: new Date()
+    });
+
+    await Customer.findByIdAndUpdate(invoice.customerId, {
+      $push: { invoicesReturn: returnInvoice._id }
     });
 
     res.status(200).json({
@@ -273,3 +290,4 @@ exports.bestSellers = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
