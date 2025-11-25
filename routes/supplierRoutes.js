@@ -19,9 +19,10 @@ router.post("/", supplierController.createNewSupplier);
 router.put("/:id", supplierController.updateSupplier);
 // router.delete("/:id", supplierController.deleteSupplier);
 
-router.delete("/collection", supplierController.collection);
+router.put("/collection/:id", supplierController.collection);
 router.put("/addToSupplierBalance/:id", supplierController.addToSupplierBalance);
 
 
 module.exports = router;
+
 
