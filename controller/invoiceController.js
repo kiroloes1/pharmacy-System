@@ -140,109 +140,108 @@ if (oldInvoice && updatedInvoice && oldInvoice.remaining !== updatedInvoice.rema
 };
 
 // return invoices
+
 exports.returnInvoice = async (req, res) => {
   try {
     const invoiceId = req.params.id;
     const { returnProducts, returnReason } = req.body;
 
-    if (!returnProducts || returnProducts.length === 0) {
-      return res.status(400).json({ message: "No returned products provided" });
-    }
-
-    // 1) Load original invoice
+    // 1) جلب الفاتورة
     const invoice = await InvoiceModel.findById(invoiceId);
     if (!invoice) {
       return res.status(404).json({ message: "Invoice not found" });
     }
 
-    // 2) Validate returned products
+    if (!invoice.products || invoice.products.length === 0) {
+      return res.status(400).json({ message: "Invoice has no products" });
+    }
+
+    let totalReturned = 0;
+
+    // 2) تحقق من كمية المرتجع لكل منتج
     for (let rp of returnProducts) {
-      const original = invoice.products.find(
+      const productInInvoice = invoice.products.find(
         p => p.productId.toString() === rp.productId.toString()
       );
 
-      if (!original) {
+      if (!productInInvoice) {
         return res.status(400).json({
           message: `Product ${rp.productId} not found in invoice`
         });
       }
 
-      if (rp.qty > original.quantity) {
+      if (rp.qty > productInInvoice.quantity) {
         return res.status(400).json({
-          message: `Returned qty (${rp.qty}) exceeds invoice qty (${original.quantity})`
+          message: `Return quantity (${rp.qty}) exceeds purchased quantity (${productInInvoice.quantity})`
         });
       }
 
-      // If price not sent → get from invoice
-      rp.price = rp.price || original.unitPrice;
-    }
-
-    // 3) Update stock (increase qty because customer returned them)
-    for (let rp of returnProducts) {
+      // 3) إعادة الكمية للمخزون
       await ProductModel.findByIdAndUpdate(rp.productId, {
         $inc: { quantity: rp.qty }
       });
+
+      // 4) حساب قيمة المرتجع بعد الخصم
+      const unitPrice = Number(productInInvoice.unitPrice || 0);
+      const discount = Number(invoice.discount || 0);
+      const returnedValue = unitPrice * rp.qty * (100 - discount) / 100;
+
+      totalReturned += returnedValue;
+
+      // 5) تحديث كمية الفاتورة
+      productInInvoice.quantity -= rp.qty;
     }
 
-    // 4) Create return invoice record
-    const returnInvoice = await InvoiceReturnModel.create({
+    // 6) إزالة المنتجات التي أصبحت كميتها صفر
+    invoice.products = invoice.products.filter(p => p.quantity > 0);
+
+    // 7) تحديث القيم المالية للفاتورة
+    if (invoice.products.length === 0) {
+      invoice.return = true;
+      invoice.total = 0;
+      invoice.totalAfterDiscount = 0;
+      invoice.remaining = 0;
+    } else {
+      invoice.total = invoice.products.reduce((sum, p) => {
+        const unitPrice = Number(p.unitPrice || 0);
+        const quantity = Number(p.quantity || 0);
+        return sum + unitPrice * quantity;
+      }, 0);
+
+      const discount = Number(invoice.discount || 0);
+      const paid = Number(invoice.paid || 0);
+
+      invoice.totalAfterDiscount = invoice.total - (discount * invoice.total) / 100;
+      invoice.remaining = invoice.totalAfterDiscount - paid;
+    }
+
+    await invoice.save();
+
+    // 8) تحديث رصيد العميل
+    await Customer.findByIdAndUpdate(invoice.customerId, {
+      $inc: { remainingBalance: -totalReturned },
+      $push: { invoicesReturn: [] } // مؤقتاً إذا لم يكن موجود في النموذج
+    });
+
+    // 9) إنشاء سجل الإرجاع
+    const returnInvoice = await invoiceReturnModel.create({
       invoiceId: invoice._id,
       customerId: invoice.customerId,
       products: returnProducts.map(rp => ({
         productId: rp.productId,
         qty: rp.qty,
-        sellPrice: rp.price,
-        total: rp.price * rp.qty
+        sellPrice: Number(rp.sellPrice || 0)
       })),
+      totalReturned: totalReturned,
       reason: returnReason || "No reason provided",
-      createdAt: new Date()
+      returnDate: new Date()
     });
 
-    // 5) Update invoice products
-    invoice.products.forEach(p => {
-      const returned = returnProducts.find(
-        rp => rp.productId.toString() === p.productId.toString()
-      );
-      if (returned) p.quantity -= returned.qty;
-    });
-
-    // Remove product if qty becomes 0
-    invoice.products = invoice.products.filter(p => p.quantity > 0);
-
-    if (invoice.products.length === 0) {
-      invoice.return = true; // full invoice return
-    }
-
-    // 6) Recalculate invoice totals
-    invoice.total = invoice.products.reduce(
-      (sum, p) => sum + p.unitPrice * p.quantity,
-      0
-    );
-
-    invoice.totalAfterDiscount =
-      invoice.total - (invoice.discount * invoice.total) / 100;
-
-    invoice.remaining = invoice.totalAfterDiscount - invoice.paid;
-
-    await invoice.save();
-
-    // 7) Update customer balance
-    const totalReturned = returnProducts.reduce(
-      (sum, rp) => sum + rp.price * rp.qty,
-      0
-    );
-
-    // Customer remaining money decreases (he owes less money)
-    await CustomerModel.findByIdAndUpdate(invoice.customerId, {
-      $inc: { remainingBalance: -totalReturned }
-    });
-
-    // Add reference to return invoice in customer schema
-    await CustomerModel.findByIdAndUpdate(invoice.customerId, {
+    // ربط سجل الإرجاع بالعميل
+    await Customer.findByIdAndUpdate(invoice.customerId, {
       $push: { invoicesReturn: returnInvoice._id }
     });
 
-    // 8) Response
     res.status(200).json({
       message: "Invoice returned successfully",
       returnInvoice,
@@ -250,7 +249,7 @@ exports.returnInvoice = async (req, res) => {
     });
 
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
@@ -331,4 +330,5 @@ exports.benefit = async (req, res) => {
     res.status(500).json({ message: "Server error: " + err.message });
   }
 };
+
 
