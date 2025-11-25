@@ -13,7 +13,7 @@ exports.getAllProducts = async (req, res) => {
         // تعيين IsNearlyExpired لكل منتج
         const updatedProducts = products.map(product => {
             const expDate = new Date(product.expiration);
-            product.IsNearlyExpired = (expDate >= now && expDate <= fourMonthsLater);
+            product.IsNearlyExpired = (expDate >= now && expDate <= fourMonthsLater || expDate < now);
             return product;
         });
 
@@ -218,4 +218,5 @@ exports.getExpiredProducts = async (req, res) => {
         res.status(500).json({ message: "server error" });
     }
 };
+
 
