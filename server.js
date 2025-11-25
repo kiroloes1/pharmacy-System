@@ -18,12 +18,13 @@ const InvoicesReturn=require(`${__dirname}/routes/invoiceReturnRoutes`);
 const Expenses=require(`${__dirname}/routes/expenseRoutes`);
 
 
-
 const cors = require("cors");
+
 app.use(cors({
-  origin: "http://localhost:5173", // العنوان اللي شغال عليه React
-  credentials: true
-}));
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+]));
+
 
 
 app.use(express.json());
@@ -49,3 +50,4 @@ app.listen(port,()=>{
     console.log(`Server running on port ${port}`);
 
 })
+
