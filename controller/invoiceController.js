@@ -145,9 +145,11 @@ exports.returnInvoice = async (req, res) => {
     const invoiceId = req.params.id;
     const { returnProducts, returnReason } = req.body;
 
-    // 1) Get invoice
+    // 1) جلب الفاتورة
     const invoice = await InvoiceModel.findById(invoiceId);
-    if (!invoice) return res.status(404).json({ message: "Invoice not found" });
+    if (!invoice) {
+      return res.status(404).json({ message: "Invoice not found" });
+    }
 
     if (!invoice.products || invoice.products.length === 0) {
       return res.status(400).json({ message: "Invoice has no products" });
@@ -155,65 +157,81 @@ exports.returnInvoice = async (req, res) => {
 
     let totalReturned = 0;
 
-    // 2) Validate returned quantities
+    // 2) تحقق من كمية المرتجع لكل منتج
     for (let rp of returnProducts) {
       const productInInvoice = invoice.products.find(
         (p) => p.productId.toString() === rp.productId.toString()
       );
 
-      if (!productInInvoice)
-        return res.status(400).json({ message: `Product ${rp.productId} not found in invoice` });
-
-      if (rp.qty > productInInvoice.quantity)
+      if (!productInInvoice) {
         return res.status(400).json({
-          message: `Return quantity (${rp.qty}) exceeds purchased quantity (${productInInvoice.quantity})`
+          message: `Product ${rp.productId} not found in invoice`
         });
+      }
 
-      // 3) Return qty back to stock
-      await ProductModel.findByIdAndUpdate(rp.productId, { $inc: { quantity: rp.qty } });
+      const productQty = Number(productInInvoice.quantity || 0);
+      const returnQty = Number(rp.qty || 0);
 
-      // 4) Calculate value after discount
+      if (returnQty > productQty) {
+        return res.status(400).json({
+          message: `Return quantity (${returnQty}) exceeds purchased quantity (${productQty})`
+        });
+      }
+
+      // 3) إعادة الكمية للمخزون
+      await ProductModel.findByIdAndUpdate(rp.productId, {
+        $inc: { quantity: returnQty }
+      });
+
+      // 4) حساب قيمة المرتجع بعد الخصم
       const unitPrice = Number(productInInvoice.unitPrice || 0);
       const discount = Number(invoice.discount || 0);
-      const returnedValue = unitPrice * rp.qty * (100 - discount) / 100;
 
+      const returnedValue = unitPrice * returnQty * (100 - discount) / 100;
       totalReturned += returnedValue;
 
-      // 5) Reduce qty in invoice
-      productInInvoice.quantity -= rp.qty;
+      // 5) تحديث كمية الفاتورة
+      productInInvoice.quantity = productQty - returnQty;
     }
 
-    // 6) Remove zero-quantity products
-    invoice.products = invoice.products.filter((p) => p.quantity > 0);
+    // 6) إزالة المنتجات التي أصبحت كميتها صفر
+    invoice.products = invoice.products.filter((p) => Number(p.quantity) > 0);
 
-    // 7) Recalculate totals
+    // 7) إعادة حساب القيم المالية
+    const total = invoice.products.reduce((sum, p) => {
+      const unitPrice = Number(p.unitPrice || 0);
+      const quantity = Number(p.quantity || 0);
+      return sum + unitPrice * quantity;
+    }, 0);
+
+    const discount = Number(invoice.discount || 0);
+    const paid = Number(invoice.paid || 0);
+
+    invoice.total = total;
+    invoice.totalAfterDiscount = total - (discount * total) / 100;
+    invoice.remaining = invoice.totalAfterDiscount - paid;
+
     if (invoice.products.length === 0) {
       invoice.return = true;
       invoice.total = 0;
       invoice.totalAfterDiscount = 0;
       invoice.remaining = 0;
-    } else {
-      invoice.total = invoice.products.reduce((sum, p) => sum + (p.unitPrice * p.quantity), 0);
-      const discount = Number(invoice.discount || 0);
-      const paid = Number(invoice.paid || 0);
-      invoice.totalAfterDiscount = invoice.total - (discount * invoice.total) / 100;
-      invoice.remaining = invoice.totalAfterDiscount - paid;
     }
 
     await invoice.save();
 
-    // 8) Update customer balance directly
+    // 8) تحديث رصيد العميل
     await Customer.findByIdAndUpdate(invoice.customerId, {
-      $inc: { remainingBalance: -totalReturned }  // يقلل رصيد العميل
+      $inc: { remainingBalance: -totalReturned }
     });
 
-    // 9) Create return record (اختياري لو عايز بس لسجل المرتجع)
+    // 9) إنشاء سجل الإرجاع
     const returnInvoice = await invoiceReturnModel.create({
       invoiceId: invoice._id,
       customerId: invoice.customerId,
       products: returnProducts.map((rp) => ({
         productId: rp.productId,
-        qty: rp.qty,
+        qty: Number(rp.qty || 0),
         sellPrice: Number(rp.sellPrice || 0)
       })),
       totalReturned,
@@ -221,7 +239,7 @@ exports.returnInvoice = async (req, res) => {
       returnDate: new Date()
     });
 
-    return res.status(200).json({
+    res.status(200).json({
       message: "Invoice returned successfully",
       returnInvoice,
       updatedInvoice: invoice
@@ -229,9 +247,13 @@ exports.returnInvoice = async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Server error", error: err.message });
+    res.status(500).json({
+      message: "Server error",
+      error: err.message
+    });
   }
 };
+
 
 
 // producrs is more sell
@@ -311,6 +333,7 @@ exports.benefit = async (req, res) => {
     res.status(500).json({ message: "Server error: " + err.message });
   }
 };
+
 
 
 
