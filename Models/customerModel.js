@@ -26,11 +26,22 @@ const customerSchema=new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Invoice",
     default: []
+    }],
+    typeCollection:{
+      type:String,
+      default:"in"
+    },
+    invoicesReturn:[{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "InvoiceReturn",
+      default: []
     }]
+
 
 
 });
 const customer=mongoose.model("customer",customerSchema);
+
 
 
 module.exports=customer;
