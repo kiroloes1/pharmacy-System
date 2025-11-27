@@ -1,0 +1,368 @@
+
+
+2025-11-22T19:59:27.360Z - POST /login
+ Headers: {"host":"localhost:8000","connection":"keep-alive","content-length":"56","sec-ch-ua-platform":"\"Windows\"","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0","sec-ch-ua":"\"Chromium\";v=\"142\", \"Microsoft Edge\";v=\"142\", \"Not_A Brand\";v=\"99\"","content-type":"application/json","sec-ch-ua-mobile":"?0","accept":"*/*","origin":"http://localhost:3000","sec-fetch-site":"same-site","sec-fetch-mode":"cors","sec-fetch-dest":"empty","referer":"http://localhost:3000/","accept-encoding":"gzip, deflate, br, zstd","accept-language":"en-US,en;q=0.9"}
+ Body: {"email":"kiroloesreda@gmail.com",}
+
+2025-11-22T20:00:32.107Z - POST /login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-22T20:07:01.866Z - POST /login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-22T22:02:06.713Z - POST /login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-22T22:02:59.315Z - POST /login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-22T22:14:02.614Z - POST /login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-23T09:51:00.906Z - POST /login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-23T09:51:37.773Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-23T09:51:46.040Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-23T09:55:06.205Z - GET /
+  email: undefined
+
+2025-11-23T09:55:06.426Z - GET /
+  email: undefined
+
+2025-11-23T09:56:31.519Z - GET /
+  email: ""
+
+2025-11-23T09:56:32.884Z - GET /
+  email: ""
+
+2025-11-23T10:03:01.726Z - GET /
+  email: ""
+
+2025-11-23T10:03:01.973Z - GET /
+  email: ""
+
+2025-11-23T10:05:42.781Z - GET /
+  email: ""
+
+2025-11-23T10:05:43.299Z - GET /
+  email: ""
+
+2025-11-23T10:06:55.368Z - GET /
+  email: ""
+
+2025-11-23T10:06:55.541Z - GET /
+  email: ""
+
+2025-11-23T10:07:03.460Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-23T10:07:08.712Z - GET /
+  email: ""
+
+2025-11-23T10:07:08.901Z - GET /
+  email: ""
+
+2025-11-23T10:13:07.639Z - GET /
+  email: ""
+
+2025-11-23T10:13:07.892Z - GET /
+  email: ""
+
+2025-11-23T10:13:14.131Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-23T10:13:19.431Z - GET /
+  email: ""
+
+2025-11-23T10:13:19.806Z - GET /
+  email: ""
+
+2025-11-23T11:32:13.866Z - GET /getUserById/69220f03353f9467bcdffaca
+  email: ""
+
+2025-11-23T11:32:16.308Z - GET /getUserById/69220f03353f9467bcdffaca
+  email: ""
+
+2025-11-23T11:32:26.048Z - PATCH /69220f03353f9467bcdffaca
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-23T11:32:31.664Z - GET /getUserById/69220f03353f9467bcdffaca
+  email: ""
+
+2025-11-23T11:32:31.973Z - GET /getUserById/69220f03353f9467bcdffaca
+  email: ""
+
+2025-11-23T11:48:52.101Z - GET /
+  email: ""
+
+2025-11-23T11:48:52.301Z - GET /
+  email: ""
+
+2025-11-23T11:48:56.556Z - GET /getUserById/69220f03353f9467bcdffaca
+  email: ""
+
+2025-11-23T11:48:56.797Z - GET /getUserById/69220f03353f9467bcdffaca
+  email: ""
+
+2025-11-23T11:49:20.257Z - POST /signUp
+  email: "keroreda@gmail.com"
+
+2025-11-23T11:49:25.416Z - GET /
+  email: ""
+
+2025-11-23T11:49:26.006Z - GET /
+  email: ""
+
+2025-11-23T11:49:28.172Z - GET /getUserById/6922f4c0c329306ad96551e1
+  email: ""
+
+2025-11-23T11:49:28.411Z - GET /getUserById/6922f4c0c329306ad96551e1
+  email: ""
+
+2025-11-23T11:49:30.094Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-23T11:49:30.773Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-23T11:49:32.978Z - GET /
+  email: ""
+
+2025-11-23T11:49:33.181Z - GET /
+  email: ""
+
+2025-11-23T11:49:36.314Z - GET /
+  email: ""
+
+2025-11-23T11:49:36.551Z - GET /
+  email: ""
+
+2025-11-23T11:49:47.898Z - PUT /6922f4c0c329306ad96551e1
+  email: ""
+
+2025-11-23T11:49:48.314Z - GET /
+  email: ""
+
+2025-11-23T11:49:59.127Z - POST /login
+  email: "keroreda@gmail.com"
+
+2025-11-23T11:50:02.666Z - POST /login
+  email: "keroreda@gmail.com"
+
+2025-11-23T11:50:14.931Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-23T11:50:18.516Z - GET /
+  email: ""
+
+2025-11-23T11:50:18.753Z - GET /
+  email: ""
+
+2025-11-23T11:52:37.012Z - GET /
+  email: ""
+
+2025-11-23T11:52:37.034Z - GET /
+  email: ""
+
+2025-11-23T11:52:43.761Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-23T11:52:48.558Z - POST /login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-23T11:52:52.673Z - GET /
+  email: ""
+
+2025-11-23T11:52:52.679Z - GET /
+  email: ""
+
+2025-11-23T13:02:40.673Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-23T13:02:45.212Z - POST /login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-23T15:09:24.503Z - GET /
+  email: ""
+
+2025-11-23T15:09:24.539Z - GET /
+  email: ""
+
+2025-11-23T15:21:04.798Z - GET /getUserById/691f785937a587cc35ccec10
+  email: ""
+
+2025-11-23T15:21:04.812Z - GET /getUserById/691f785937a587cc35ccec10
+  email: ""
+
+2025-11-23T15:21:10.210Z - PATCH /691f785937a587cc35ccec10
+  email: "kiroloesreda@gmail.com"
+
+2025-11-23T15:22:13.514Z - POST /signUp
+  email: "02200270@eng.asu.edu.eg"
+
+2025-11-23T15:22:18.262Z - GET /
+  email: ""
+
+2025-11-23T15:22:18.272Z - GET /
+  email: ""
+
+2025-11-23T15:22:53.789Z - POST /login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-23T15:22:56.469Z - GET /
+  email: ""
+
+2025-11-23T15:22:56.490Z - GET /
+  email: ""
+
+2025-11-23T15:23:06.332Z - PUT /692326a5579c9eb3613a0406
+  email: ""
+
+2025-11-23T15:23:06.373Z - GET /
+  email: ""
+
+2025-11-23T15:35:55.236Z - GET /
+  email: ""
+
+2025-11-23T15:35:55.242Z - GET /
+  email: ""
+
+2025-11-23T15:47:30.135Z - GET /
+  email: ""
+
+2025-11-23T15:47:30.141Z - GET /
+  email: ""
+
+2025-11-23T19:03:36.686Z - GET /
+  email: ""
+
+2025-11-23T19:03:36.708Z - GET /
+  email: ""
+
+2025-11-23T19:11:14.821Z - GET /
+  email: ""
+
+2025-11-23T19:11:14.833Z - GET /
+  email: ""
+
+2025-11-23T20:35:50.087Z - GET /
+  email: ""
+
+2025-11-23T20:35:50.095Z - GET /
+  email: ""
+
+2025-11-24T00:50:38.922Z - GET /
+  email: ""
+
+2025-11-24T00:50:38.945Z - GET /
+  email: ""
+
+2025-11-24T00:58:59.707Z - GET /
+  email: ""
+
+2025-11-24T00:58:59.730Z - GET /
+  email: ""
+
+2025-11-24T02:03:15.546Z - GET /
+  email: ""
+
+2025-11-24T02:03:15.553Z - GET /
+  email: ""
+
+2025-11-24T02:12:41.124Z - GET /
+  email: ""
+
+2025-11-24T02:12:41.143Z - GET /
+  email: ""
+
+2025-11-24T02:13:01.302Z - GET /getUserById/691f785937a587cc35ccec10
+  email: ""
+
+2025-11-24T02:13:01.314Z - GET /getUserById/691f785937a587cc35ccec10
+  email: ""
+
+2025-11-24T15:34:02.640Z - POST /login
+  email: "{ \"username\": { \"$ne\": null }, \"password\": { \"$ne\": null } }"
+
+2025-11-24T15:34:19.640Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-24T15:34:22.343Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-24T15:34:53.924Z - POST /login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-24T15:36:21.747Z - POST /login
+  email: "{ \"email\": { \"$ne\": null }}"
+
+2025-11-24T15:40:38.757Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-24T15:40:44.238Z - POST /login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-24T22:44:34.597Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-24T22:44:38.045Z - POST /login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-24T23:10:45.748Z - GET /getUserById/691f785937a587cc35ccec10
+  email: ""
+
+2025-11-24T23:10:45.759Z - GET /getUserById/691f785937a587cc35ccec10
+  email: ""
+
+2025-11-24T23:12:16.623Z - GET /getUserById/691f785937a587cc35ccec10
+  email: ""
+
+2025-11-24T23:13:26.669Z - GET /getUserById/691f785937a587cc35ccec10
+  email: ""
+
+2025-11-24T23:14:32.527Z - GET /
+  email: ""
+
+2025-11-24T23:14:32.546Z - GET /
+  email: ""
+
+2025-11-24T23:19:21.819Z - GET /
+  email: ""
+
+2025-11-24T23:19:21.844Z - GET /
+  email: ""
+
+2025-11-25T01:46:50.259Z - POST /login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-25T01:51:34.360Z - POST /pharmacy-system-pharmacysystem2.up.railway.app/v1/Users/login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-25T01:51:35.640Z - POST /pharmacy-system-pharmacysystem2.up.railway.app/v1/Users/login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-25T01:51:41.859Z - POST /pharmacy-system-pharmacysystem2.up.railway.app/v1/Users/login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-25T01:55:48.442Z - POST /pharmacy-system-pharmacysystem2.up.railway.app/v1/Users/login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-25T01:56:11.393Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-25T01:56:16.820Z - POST /login
+  email: "kiroloesreda@gmail.com"
+
+2025-11-25T08:49:38.454Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-25T09:08:48.605Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
+
+2025-11-25T09:09:45.384Z - POST /login
+  email: "2200270@eng.asu.edu.eg"
