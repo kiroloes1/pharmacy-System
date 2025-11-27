@@ -31,8 +31,15 @@ const supplierSchema=new mongoose.Schema({
         ref: "Purchase",
         default: []
     }]
+             purchasesReturn:[{
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "PurchaseReturn",
+          default: []
+        }]
+    
 
 });
 
 const supplier=mongoose.model("supplier",supplierSchema);
+
 module.exports=supplier;
