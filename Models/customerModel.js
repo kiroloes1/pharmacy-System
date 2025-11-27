@@ -30,12 +30,7 @@ const customerSchema=new mongoose.Schema({
     typeCollection:{
       type:String,
       default:"in"
-    },
-    invoicesReturn:[{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "InvoiceReturn",
-      default: []
-    }]
+    }
 
 
 
@@ -45,3 +40,4 @@ const customer=mongoose.model("customer",customerSchema);
 
 
 module.exports=customer;
+
