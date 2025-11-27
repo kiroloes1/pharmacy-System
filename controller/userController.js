@@ -139,12 +139,12 @@ exports.createNewUser = async (req, res) => {
         res.status(500).json({ message: "server error"+e.message });
     }
 };
-
 // Update user (only safe fields)
 exports.updateUser = async (req, res) => {
     try {
         const id = req.params.id;
-        const { name, role } = req.body;
+        
+        const { name, role ,password , email,phone } = req.body;
 
         if (!id || (!name && !role)) {
             return res.status(400).json({ message: "الرجاء التأكد من ملئ كل الحقول" });
@@ -153,7 +153,12 @@ exports.updateUser = async (req, res) => {
         const updates = {};
         if (name) updates.name = name;
         if (role) updates.role = role;
+        if (password) updates.password =await bcrypt.hash(password,10);
+        if (email) updates.email = email;
+        if (phone) updates.phone = phone;
 
+
+        
         const user = await User.findByIdAndUpdate(id, updates, { new: true });
 
         if (!user) {
@@ -223,5 +228,6 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json({ message: "server error" });
     }
 };
+
 
 
