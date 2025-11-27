@@ -30,7 +30,7 @@ const supplierSchema=new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Purchase",
         default: []
-    }]
+    }],
              purchasesReturn:[{
           type: mongoose.Schema.Types.ObjectId,
           ref: "PurchaseReturn",
@@ -43,3 +43,4 @@ const supplierSchema=new mongoose.Schema({
 const supplier=mongoose.model("supplier",supplierSchema);
 
 module.exports=supplier;
+
