@@ -18,6 +18,8 @@ const purchasesReturnRouter = require(`${__dirname}/routes/PurchaseReturnRoutes`
 const invoicesReturnRouter = require(`${__dirname}/routes/invoiceReturnRoutes`);
 const expensesRouter = require(`${__dirname}/routes/expenseRoutes`);
 const reportRouter = require(`${__dirname}/routes/reportRoutes`);
+const backupRouter = require(`${__dirname}/routes/backupRoutes`);
+
 
 const cors = require("cors");
 
@@ -37,6 +39,7 @@ app.use("/v1/PurchasesReturn", purchasesReturnRouter);
 app.use("/v1/InvoicesReturn", invoicesReturnRouter);
 app.use("/v1/Expenses", expensesRouter);
 app.use("/v1/reports", reportRouter);
+app.use("/v2/backup",backupRouter)
 
 // error middleware
 app.use(errorHandler);
@@ -45,5 +48,6 @@ app.use(errorHandler);
 app.listen(port, () => {
   console.log("Server running on port", port);
 });
+
 
 
