@@ -8,8 +8,7 @@ const purchaseModel = require(`${__dirname}/../Models/purchaseModel`);
 const Customer = require(`${__dirname}/../Models/customerModel`);
 const supplierModel = require(`${__dirname}/../Models/supplierModel`);
 const ProductModel = require(`${__dirname}/../Models/productModel`);
-
-function calculateReportFromInvoices(invoices, expenses) {
+async function calculateReportFromInvoices(invoices, expenses) {
   let totalSales = 0;
  
   let totalExpenses = 0;
@@ -22,7 +21,7 @@ function calculateReportFromInvoices(invoices, expenses) {
 
 
   
-
+const products = await ProductModel.find({});
     let totalPurchase = 0;
     const productMap = new Map(products.map(p => [p._id.toString(), p]));
 
@@ -46,6 +45,7 @@ function calculateReportFromInvoices(invoices, expenses) {
     profit
   };
 }
+
 
 exports.dailyReport = async (req, res) => {
   try {
@@ -182,3 +182,4 @@ exports.reports = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
