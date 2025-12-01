@@ -307,32 +307,54 @@ exports.bestSellers = async (req, res) => {
 // benfit
 exports.benefit = async (req, res) => {
   try {
-    // Get all invoices
-    const invoiceData = await InvoiceModel.find();
+    // 1) Get all invoices + all expenses
+    const invoices = await InvoiceModel.find({});
+    const expenses = await Expense.find({});
+    const products = await ProductModel.find({}); // get once
 
-    // Sum of totalAfterDiscount
-    const totalRevenue = invoiceData.reduce((acc, curr) => acc + curr.totalAfterDiscount, 0);
+    // Prepare a map for faster lookup
+    const productMap = new Map(products.map(p => [p._id.toString(), p]));
 
-    // Get all expenses
-    const expenses = await ExpenseModel.find();
+    // 2) Calculate totals
+    const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+    const totalSell = invoices.reduce((sum, inv) => sum + inv.totalAfterDiscount, 0);
+    const totalRemaining = invoices.reduce((sum, inv) => sum + inv.remaining, 0);
 
-    // Sum of all expenses
-    const totalExpenses = expenses.reduce((acc, curr) => acc + curr.amount, 0);
+    let totalPurchase = 0;
 
-    // Calculate profit
-    const totalProfit = totalRevenue - totalExpenses;
+    // 3) Calculate purchase total efficiently
+    for (const inv of invoices) {
+      for (const item of inv.products) {
+        const product = productMap.get(item.productId.toString());
+        if (product) {
+          totalPurchase += product.purchasePrice * item.quantity;
+        }
+      }
+    }
 
-    // Send response
+    // 4) Final benefit
+    let totalBenefit = totalSell - totalPurchase - totalExpenses;
+    let totalBenefitWithRemaining = totalBenefit - totalRemaining;
+
+    // 5) Send response
     res.status(200).json({
-      totalRevenue,
+      message: "success",
+      totalBenefit,
+      totalBenefitWithRemaining,
+      totalSell,
+      totalPurchase,
       totalExpenses,
-      totalProfit
+      totalRemaining
     });
 
   } catch (err) {
-    res.status(500).json({ message: "Server error: " + err.message });
+    res.status(500).json({
+      message: "Server error",
+      error: err.message
+    });
   }
 };
+
 
 
 
