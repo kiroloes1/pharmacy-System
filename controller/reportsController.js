@@ -11,7 +11,7 @@ const ProductModel = require(`${__dirname}/../Models/productModel`);
 
 function calculateReportFromInvoices(invoices, expenses) {
   let totalSales = 0;
-  let totalPurchases = 0;
+ 
   let totalExpenses = 0;
 
   // 1) إجمالي البيع
@@ -20,25 +20,33 @@ function calculateReportFromInvoices(invoices, expenses) {
   // 2) إجمالي المصروفات
   totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
-  // 3) حساب تكلفة الشراء من المنتجات داخل الفاتورة
-  for (const inv of invoices) {
-    for (const item of inv.products) {
-      const purchasePrice = item.productId.purchasePrice;
-      const qty = item.quantity;
-      totalPurchases += purchasePrice * qty;
+
+  
+
+    let totalPurchase = 0;
+    const productMap = new Map(products.map(p => [p._id.toString(), p]));
+
+    // 3) Calculate purchase total efficiently
+    for (const inv of invoices) {
+      for (const item of inv.products) {
+        const product = productMap.get(item.productId.toString());
+        if (product) {
+          totalPurchase += product.purchasePrice * item.quantity;
+        }
+      }
     }
-  }
 
   // 4) صافي الربح
-  const profit = totalSales - totalPurchases - totalExpenses;
+  const profit = totalSales - totalPurchase - totalExpenses;
 
   return {
     totalSales,
-    totalPurchases,
+    totalPurchase,
     totalExpenses,
     profit
   };
 }
+
 
 exports.dailyReport = async (req, res) => {
   try {
@@ -175,3 +183,4 @@ exports.reports = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
