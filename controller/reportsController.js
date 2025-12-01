@@ -1,15 +1,45 @@
+
 const express = require('express');
 
-// Models (fixed naming)
+// Models
 const InvoiceModel = require(`${__dirname}/../Models/invoiceModel`);
-const ExpenseModel = require(`${__dirname}/../Models/expensesModel`);
-const PurchaseModel = require(`${__dirname}/../Models/purchaseModel`);
+const Expense = require(`${__dirname}/../Models/expensesModel`);
+const purchaseModel = require(`${__dirname}/../Models/purchaseModel`);
 const Customer = require(`${__dirname}/../Models/customerModel`);
-const SupplierModel = require(`${__dirname}/../Models/supplierModel`);
+const supplierModel = require(`${__dirname}/../Models/supplierModel`);
 const ProductModel = require(`${__dirname}/../Models/productModel`);
 
+function calculateReportFromInvoices(invoices, expenses) {
+  let totalSales = 0;
+  let totalPurchases = 0;
+  let totalExpenses = 0;
 
-// ======================= Daily Report =======================
+  // 1) إجمالي البيع
+  totalSales = invoices.reduce((sum, inv) => sum + inv.totalAfterDiscount, 0);
+
+  // 2) إجمالي المصروفات
+  totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+
+  // 3) حساب تكلفة الشراء من المنتجات داخل الفاتورة
+  for (const inv of invoices) {
+    for (const item of inv.products) {
+      const purchasePrice = item.productId.purchasePrice;
+      const qty = item.quantity;
+      totalPurchases += purchasePrice * qty;
+    }
+  }
+
+  // 4) صافي الربح
+  const profit = totalSales - totalPurchases - totalExpenses;
+
+  return {
+    totalSales,
+    totalPurchases,
+    totalExpenses,
+    profit
+  };
+}
+
 exports.dailyReport = async (req, res) => {
   try {
     const { date } = req.query;
@@ -17,22 +47,19 @@ exports.dailyReport = async (req, res) => {
     const start = new Date(date + "T00:00:00");
     const end = new Date(date + "T23:59:59");
 
-    const invoices = await InvoiceModel.find({ createdAt: { $gte: start, $lte: end }});
-    const expenses = await ExpenseModel.find({ createdAt: { $gte: start, $lte: end }});
-    const purchases = await PurchaseModel.find({ createdAt: { $gte: start, $lte: end }});
+    const invoices = await InvoiceModel.find({
+      createdAt: { $gte: start, $lte: end }
+    });
 
-    const totalSales = invoices.reduce((acc, c) => acc + c.totalAfterDiscount, 0);
-    const totalPurchases = purchases.reduce((acc, c) => acc + c.totalAfterDiscount, 0);
-    const totalExpenses = expenses.reduce((acc, c) => acc + c.amount, 0);
+    const expenses = await Expense.find({
+      createdAt: { $gte: start, $lte: end }
+    });
 
-    const profit = totalSales - totalPurchases - totalExpenses;
+    const result = calculateReportFromInvoices(invoices, expenses);
 
     res.json({
       date,
-      totalSales,
-      totalPurchases,
-      totalExpenses,
-      profit,
+      ...result,
       invoiceCount: invoices.length
     });
 
@@ -41,8 +68,6 @@ exports.dailyReport = async (req, res) => {
   }
 };
 
-
-// ======================= Monthly Report =======================
 exports.monthlyReport = async (req, res) => {
   try {
     const { year, month } = req.query;
@@ -50,23 +75,20 @@ exports.monthlyReport = async (req, res) => {
     const start = new Date(year, month - 1, 1);
     const end = new Date(year, month, 0, 23, 59, 59);
 
-    const invoices = await InvoiceModel.find({ createdAt: { $gte: start, $lte: end }});
-    const expenses = await ExpenseModel.find({ createdAt: { $gte: start, $lte: end }});
-    const purchases = await PurchaseModel.find({ createdAt: { $gte: start, $lte: end }});
+    const invoices = await InvoiceModel.find({
+      createdAt: { $gte: start, $lte: end }
+    });
 
-    const totalSales = invoices.reduce((acc, c) => acc + c.totalAfterDiscount, 0);
-    const totalPurchases = purchases.reduce((acc, c) => acc + c.totalAfterDiscount, 0);
-    const totalExpenses = expenses.reduce((acc, c) => acc + c.amount, 0);
+    const expenses = await Expense.find({
+      createdAt: { $gte: start, $lte: end }
+    });
 
-    const profit = totalSales - totalPurchases - totalExpenses;
+    const result = calculateReportFromInvoices(invoices, expenses);
 
     res.json({
       year,
       month,
-      totalSales,
-      totalPurchases,
-      totalExpenses,
-      profit,
+      ...result,
       invoiceCount: invoices.length
     });
 
@@ -75,8 +97,6 @@ exports.monthlyReport = async (req, res) => {
   }
 };
 
-
-// ======================= Yearly Report =======================
 exports.yearlyReport = async (req, res) => {
   try {
     const { year } = req.query;
@@ -84,22 +104,19 @@ exports.yearlyReport = async (req, res) => {
     const start = new Date(year, 0, 1);
     const end = new Date(year, 11, 31, 23, 59, 59);
 
-    const invoices = await InvoiceModel.find({ createdAt: { $gte: start, $lte: end }});
-    const expenses = await ExpenseModel.find({ createdAt: { $gte: start, $lte: end }});
-    const purchases = await PurchaseModel.find({ createdAt: { $gte: start, $lte: end }});
+    const invoices = await InvoiceModel.find({
+      createdAt: { $gte: start, $lte: end }
+    });
 
-    const totalSales = invoices.reduce((acc, c) => acc + c.totalAfterDiscount, 0);
-    const totalPurchases = purchases.reduce((acc, c) => acc + c.totalAfterDiscount, 0);
-    const totalExpenses = expenses.reduce((acc, c) => acc + c.amount, 0);
+    const expenses = await Expense.find({
+      createdAt: { $gte: start, $lte: end }
+    });
 
-    const profit = totalSales - totalPurchases - totalExpenses;
+    const result = calculateReportFromInvoices(invoices, expenses);
 
     res.json({
       year,
-      totalSales,
-      totalPurchases,
-      totalExpenses,
-      profit,
+      ...result,
       invoiceCount: invoices.length
     });
 
@@ -108,36 +125,53 @@ exports.yearlyReport = async (req, res) => {
   }
 };
 
-
-// ======================= System Summary Report =======================
 exports.reports = async (req, res) => {
   try {
     const invoices = await InvoiceModel.find({});
     const customers = await Customer.find({});
-    const purchases = await PurchaseModel.find({});
-    const suppliers = await SupplierModel.find({});
+    const suppliers = await supplierModel.find({});
     const products = await ProductModel.find({});
-    const expenses = await ExpenseModel.find({});
+    const expenses = await Expense.find({});
 
-    const summary = {
-      invoicesLength: invoices.length,
-      customersLength: customers.length,
-      purchasesLength: purchases.length,
-      suppliersLength: suppliers.length,
-      productsLength: products.length,
+    const invoicesLength = invoices.length;
+    const customersLength = customers.length;
+    const suppliersLength = suppliers.length;
+    const productsLength = products.length;
 
-      totalSales: invoices.reduce((acc, curr) => acc + curr.totalAfterDiscount, 0),
-      totalPurchases: purchases.reduce((acc, curr) => acc + curr.totalAfterDiscount, 0),
-      totalExpenses: expenses.reduce((acc, curr) => acc + curr.amount, 0)
-    };
+    // Total Expenses
+    const totalExpenses = expenses.reduce((acc, curr) => acc + curr.amount, 0);
 
-    summary.totalProfit =
-      summary.totalSales - summary.totalPurchases - summary.totalExpenses;
+    // Total Sales (from invoices)
+    const totalSales = invoices.reduce((acc, inv) => acc + inv.totalAfterDiscount, 0);
 
-    return res.status(200).json({ summary });
+    // Total Purchases (from products inside invoices)
+    let totalPurchases = 0;
+
+    for (const inv of invoices) {
+      for (const item of inv.products) {
+        const purchasePrice = item.productId.purchasePrice;
+        const qty = item.quantity;
+        totalPurchases += purchasePrice * qty;
+      }
+    }
+
+    // Profit
+    const totalProfit = totalSales - totalPurchases - totalExpenses;
+
+    return res.status(200).json({
+      summary: {
+        invoicesLength,
+        customersLength,
+        suppliersLength,
+        productsLength,
+        totalSales,
+        totalPurchases,
+        totalExpenses,
+        totalProfit
+      }
+    });
 
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
-
