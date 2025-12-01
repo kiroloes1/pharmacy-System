@@ -309,7 +309,7 @@ exports.benefit = async (req, res) => {
   try {
     // 1) Get all invoices + all expenses
     const invoices = await InvoiceModel.find({});
-    const expenses = await Expense.find({});
+    const expenses = await ExpenseModel.find({});
     const products = await ProductModel.find({}); // get once
 
     // Prepare a map for faster lookup
@@ -354,6 +354,7 @@ exports.benefit = async (req, res) => {
     });
   }
 };
+
 
 
 
