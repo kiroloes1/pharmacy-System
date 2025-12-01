@@ -259,7 +259,7 @@ exports.returnInvoice = async (req, res) => {
 // producrs is more sell
 exports.bestSellers = async (req, res) => {
   try {
-    const bestSellerProducts = await invoiceReturnModel.aggregate([
+    const bestSellerProducts = await InvoiceModel.aggregate([
       { 
         $unwind: "$products" // نفك الـ array إذا كان products array
       },
@@ -354,6 +354,7 @@ exports.benefit = async (req, res) => {
     });
   }
 };
+
 
 
 
