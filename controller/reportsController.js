@@ -47,7 +47,6 @@ function calculateReportFromInvoices(invoices, expenses) {
   };
 }
 
-
 exports.dailyReport = async (req, res) => {
   try {
     const { date } = req.query;
@@ -183,4 +182,3 @@ exports.reports = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
-
