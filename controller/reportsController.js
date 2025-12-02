@@ -47,18 +47,21 @@ exports.dailyReport = async (req, res) => {
     const end = new Date(date + "T23:59:59");
 
     const invoices = await InvoiceModel.find({ createdAt: { $gte: start, $lte: end } })
-                       .populate({
-            path:"products.productId",
-            model:"Products"
-        });
+ 
     const expenses = await Expense.find({ createdAt: { $gte: start, $lte: end } });
 
     const result = await calculateReportFromInvoices(invoices, expenses);
 
+
+     const invoicess = await InvoiceModel.find({ createdAt: { $gte: start, $lte: end } })
+                       .populate({
+            path:"products.productId",
+            model:"Products"
+        });
     res.json({
       date,
       ...result,
-      invoices,
+      invoicess,
       invoiceCount: invoices.length
     });
 
@@ -80,6 +83,12 @@ exports.monthlyReport = async (req, res) => {
             path:"products.productId",
             model:"Products"
         });
+
+         const invoicess = await InvoiceModel.find({ createdAt: { $gte: start, $lte: end } })
+                       .populate({
+            path:"products.productId",
+            model:"Products"
+        });
     const expenses = await Expense.find({ createdAt: { $gte: start, $lte: end } });
 
     const result = await calculateReportFromInvoices(invoices, expenses);
@@ -88,7 +97,7 @@ exports.monthlyReport = async (req, res) => {
       year,
       month,
       ...result,
-      invoices,
+      invoicess,
       invoiceCount: invoices.length
     });
 
@@ -110,6 +119,12 @@ exports.yearlyReport = async (req, res) => {
             path:"products.productId",
             model:"Products"
         });
+
+         const invoicess = await InvoiceModel.find({ createdAt: { $gte: start, $lte: end } })
+                       .populate({
+            path:"products.productId",
+            model:"Products"
+        });
     const expenses = await Expense.find({ createdAt: { $gte: start, $lte: end } });
 
     const result = await calculateReportFromInvoices(invoices, expenses);
@@ -117,7 +132,7 @@ exports.yearlyReport = async (req, res) => {
     res.json({
       year,
       ...result,
-      invoices,
+      invoicess,
       invoiceCount: invoices.length
     });
 
