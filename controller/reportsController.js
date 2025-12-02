@@ -47,7 +47,7 @@ exports.dailyReport = async (req, res) => {
     const end = new Date(date + "T23:59:59");
 
     const invoices = await InvoiceModel.find({ createdAt: { $gte: start, $lte: end } })
-               .populate({
+                       .populate({
             path:"products.productId",
             model:"Products"
         });
@@ -76,7 +76,7 @@ exports.monthlyReport = async (req, res) => {
     const end = new Date(year, month, 0, 23, 59, 59);
 
     const invoices = await InvoiceModel.find({ createdAt: { $gte: start, $lte: end } })
-               .populate({
+                       .populate({
             path:"products.productId",
             model:"Products"
         });
@@ -105,8 +105,8 @@ exports.yearlyReport = async (req, res) => {
     const start = new Date(year, 0, 1);
     const end = new Date(year, 11, 31, 23, 59, 59);
 
-    const invoices = await InvoiceModel.find({ createdAt: { $gte: start, $lte: end } }) 
-           .populate({
+    const invoices = await InvoiceModel.find({ createdAt: { $gte: start, $lte: end } })
+                   .populate({
             path:"products.productId",
             model:"Products"
         });
@@ -178,6 +178,3 @@ exports.reports = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
-
-
-
