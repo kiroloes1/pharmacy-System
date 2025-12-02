@@ -108,27 +108,32 @@ exports.getSupplierById = async (req, res) => {
 };
 
 // filter by search
-exports.FilterSupplier=async(req,res)=>{
-  try{
-        const search=req.query.supplierSearch;
-    if(!search){
-            return res.status(400).json({ message: "Please provide search query" });
+exports.FilterSupplier = async (req, res) => {
+  try {
+    const search = req.query.supplierSearch;
+
+    if (!search) {
+      return res.status(400).json({ message: "Please provide search query" });
     }
-    const FilterSupplier=await suppliersModel.find({
-        $or:[
-            {name:{$regex :search} ,$options:"i"},
-            {companyName:{$regex :search},$options: "i"}
-        ]
+
+    const FilterSupplier = await suppliersModel.find({
+      $or: [
+        { name: { $regex: search, $options: "i" } },
+        { companyName: { $regex: search, $options: "i" } }
+      ]
     });
+
     if (FilterSupplier.length === 0) {
-      return res.status(404).json({ message: "No products found matching this search" });
+      return res.status(404).json({ message: "No suppliers found matching this search" });
     }
 
     res.status(200).json({ message: "Successfully", data: FilterSupplier });
+
   } catch (error) {
     res.status(500).json({ message: `Error: ${error.message}` });
   }
-}
+};
+
 
 exports.collection = async (req, res) => {
   try {
@@ -308,6 +313,7 @@ exports.addToSupplierBalance = async (req, res) => {
 //         res.status(500).json({ message: "server error" });
 //     }
 // };
+
 
 
 
