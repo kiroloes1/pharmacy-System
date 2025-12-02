@@ -54,6 +54,7 @@ exports.dailyReport = async (req, res) => {
     res.json({
       date,
       ...result,
+      invoices,
       invoiceCount: invoices.length
     });
 
@@ -79,6 +80,7 @@ exports.monthlyReport = async (req, res) => {
       year,
       month,
       ...result,
+      invoices,
       invoiceCount: invoices.length
     });
 
@@ -103,6 +105,7 @@ exports.yearlyReport = async (req, res) => {
     res.json({
       year,
       ...result,
+      invoices,
       invoiceCount: invoices.length
     });
 
@@ -163,3 +166,4 @@ exports.reports = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
