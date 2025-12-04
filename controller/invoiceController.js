@@ -18,7 +18,7 @@ exports.getInvoice = async (req, res) => {
             path:"products.productId",
             model:"Products"
         })
-        .sort({ _id: -1 });
+       
 
         if (!invoice) {
             return res.status(404).json({ message: "invoice not found" });
@@ -43,7 +43,8 @@ exports.getAllInvoice = async (req, res) => {
         .populate({
             path:"products.productId",
             model:"Products"
-        });
+        })
+         .sort({ _id: -1 });
 
 
         res.status(200).json({
@@ -355,6 +356,7 @@ exports.benefit = async (req, res) => {
     });
   }
 };
+
 
 
 
