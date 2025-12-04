@@ -11,7 +11,7 @@ exports.getAllPurchases = async (req, res) => {
       .populate({
         path: "products.productId",
         model: "Products"
-      }).sort({ _id: -1 });
+      })   .sort({ createdAt: -1 });
 
     res.status(200).json({
       status: "success",
@@ -289,4 +289,5 @@ exports.returnPurchase = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
 
