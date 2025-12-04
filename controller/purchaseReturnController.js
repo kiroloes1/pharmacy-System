@@ -7,7 +7,8 @@ exports.getAllPurchaseReturns = async (req, res) => {
         const returns = await PurchaseReturn.find()
             .populate("purchaseId")
             .populate("supplierId")
-            .populate("products.productId");
+            .populate("products.productId")
+        .sort({ _id: -1 });
 
         return res.status(200).json({
             message: "success",
@@ -65,4 +66,5 @@ exports.deletePurchaseReturn = async (req, res) => {
         return res.status(500).json({ message: "server error" });
     }
 };
+
 
