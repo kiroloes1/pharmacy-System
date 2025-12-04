@@ -8,7 +8,8 @@ exports.getAllReturnInvoices = async (req, res) => {
             .find()
             .populate("invoiceId")
             .populate("customerId")
-            .populate("products.productId");
+            .populate("products.productId")
+        .sort({ _id: -1 });
 
         return res.status(200).json({
             message: "success",
@@ -193,3 +194,4 @@ await Customer.findByIdAndUpdate(invoice.customerId, {
     });
   }
 };
+
