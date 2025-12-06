@@ -6,6 +6,9 @@ const Expense = require(`${__dirname}/../Models/expensesModel`);
 const Customer = require(`${__dirname}/../Models/customerModel`);
 const supplierModel = require(`${__dirname}/../Models/supplierModel`);
 const ProductModel = require(`${__dirname}/../Models/productModel`);
+const purchaseModel=require(`${__dirname}/../Models/purchaseModel`)
+const invoiceReturnModel = require(`${__dirname}/../Models/invoiceReturnModel`);
+
 
 // Helper Function (used by daily/monthly/yearly)
 async function calculateReportFromInvoices(invoices, expenses) {
@@ -141,6 +144,10 @@ exports.reports = async (req, res) => {
     const suppliers = await supplierModel.find({});
     const products = await ProductModel.find({});
     const expenses = await Expense.find({});
+    const invoiceReturn=await invoiceReturnModel.find({})
+    const purchases = await purchaseModel.find({});
+
+
 
     // Prepare product map
     const productMap = new Map(products.map(p => [p._id.toString(), p]));
@@ -150,6 +157,9 @@ exports.reports = async (req, res) => {
     const customersLength = customers.length;
     const suppliersLength = suppliers.length;
     const productsLength = products.length;
+    const  returnLength=invoiceReturn.length;
+    const purchasesLength = purchases.length;
+
 
     const totalExpenses = expenses.reduce((acc, curr) => acc + curr.amount, 0);
     const totalSales = invoices.reduce((acc, inv) => acc + inv.totalAfterDiscount, 0);
@@ -177,7 +187,11 @@ exports.reports = async (req, res) => {
         totalSales,
         totalPurchases,
         totalExpenses,
-        totalProfit
+        totalProfit,
+        purchasesLength,
+         returnLength
+
+
       }
     });
 
@@ -185,4 +199,5 @@ exports.reports = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
 
