@@ -6,7 +6,9 @@ const bcrypt = require("bcrypt");
 const { error } = require("winston");
 
 // Temporary storage for reset codes
-let resetCodes = {}; // { email: code }
+let resetCodes = {
+    verify:false,
+}; // { email: code }
 
 // SEND RESET CODE
 async function sendResetCode(req, res) {
@@ -80,3 +82,4 @@ async function resetPassword(req, res) {
 }
 
 module.exports = { sendResetCode, verifyResetCode, resetPassword };
+
