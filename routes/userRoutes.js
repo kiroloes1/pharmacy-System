@@ -4,6 +4,13 @@ const userController = require(`${__dirname}/../controller/userController`);
 const {protect}=require(`${__dirname}/../middleWare/authMiddleware`);
 
 
+const resetPassword = require(`${__dirname}/../resetPassword/resetPassword`);
+
+
+router.post("/send-reset-code", resetPassword.sendResetCode);
+router.post("/verify-code",     resetPassword.verifyResetCode);
+router.post("/reset-password",  resetPassword.resetPassword);
+
 
 // Create new user
 router.post("/signUp", userController.createNewUser);
@@ -31,5 +38,6 @@ router.delete("/:id", userController.deleteUser);
 
 
 module.exports = router;
+
 
 
