@@ -20,16 +20,15 @@ async function sendResetCode(req, res) {
     resetCodes[email] = { code, verified: false };
 
     // Gmail SMTP (or Outlook)
-    const transporter = nodemailer.createTransport({
-          host: "smtp.gmail.com",
-          port: 465,        // SSL
-          secure: true,
-  
-        auth: {
-            user: "kiroloesreda@gmail.com",
-            pass: "xyyw gyzs omqu mzia"
-        }
-    });
+
+    // resetPassword.js
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
 
     const mailOptions = {
         from: "kiroloesreda@gmail.com",
@@ -76,5 +75,6 @@ async function resetPassword(req, res) {
 }
 
 module.exports = { sendResetCode, verifyResetCode, resetPassword };
+
 
 
