@@ -20,6 +20,7 @@
     "mongoose": "^8.19.3",
     "nodemailer": "^7.0.11",
     "qrcode": "^1.5.4",
+    "resend": "^6.6.0",
     "winston": "^3.19.0"
   }
 }
