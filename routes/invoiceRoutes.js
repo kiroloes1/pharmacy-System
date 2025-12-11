@@ -7,6 +7,9 @@ const { protect, restrictTo } = require(`${__dirname}/../middleWare/authMiddlewa
 // أي حد عامل login يقدر يشوف البيانات
 router.use(protect);
 
+router.use(restrictTo("admin"));
+
+
 // Get all invoice
 router.get("/", invoiceController.getAllInvoice);
 
@@ -16,8 +19,6 @@ router.get("/getElementByID/:id", invoiceController.getInvoice);
 // bestSeller
 router.get("/bestSellers", invoiceController.bestSellers);
 
-
-router.use(restrictTo("admin"));
 
 // update invoice
 router.patch("/editInvoice/:id", invoiceController.editInvoice);
@@ -34,3 +35,4 @@ router.put("/returnInvoice/:id", invoiceController.returnInvoice);
 
 
 module.exports = router;
+
