@@ -27,17 +27,22 @@ router.get("/", userController.getAllUsers);
 // Get user by ID
 router.get("/getUserById/:id", userController.getUserById);
 
-router.put("/:id", userController.BlockUser); 
 
 
 // update user
 router.patch("/:id", userController.updateUser);
+
+router.use(restrictTo("admin"));
+router.put("/:id", userController.BlockUser); 
+
+
 
 // delete
 router.delete("/:id", userController.deleteUser);
 
 
 module.exports = router;
+
 
 
 
