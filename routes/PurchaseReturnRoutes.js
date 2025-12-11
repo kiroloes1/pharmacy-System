@@ -7,6 +7,8 @@ const router = express.Router();
 // أي حد عامل login
 router.use(protect);
 
+// Admin only for delete
+router.use(restrictTo("admin"));
 // GET all purchases
 router.get("/", purchaseController.getAllPurchaseReturns);
 
@@ -14,10 +16,10 @@ router.get("/", purchaseController.getAllPurchaseReturns);
 router.get("/:id", purchaseController.getPurchaseReturnById);
 
 
-// Admin only for delete
-router.use(restrictTo("admin"));
+
 
 // Delete purchase
 router.delete("/:id", purchaseController.deletePurchaseReturn);
 
 module.exports = router;
+
