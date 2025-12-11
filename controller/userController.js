@@ -65,7 +65,7 @@ exports.userLogin = async (req, res) => {
     );
 
     // disActive all User
-    await User.updateMany({}, { $set: { active: false } });
+   
 
 // Activate current user
 existUser.active = true;
@@ -118,8 +118,7 @@ exports.createNewUser = async (req, res) => {
         });
         const token=jwt.sign({email,id:newUser._id,role:newUser.role},process.env.SECRET_KEY,{expiresIn:"1hr"})
 
-            // disActive all User
-        await User.updateMany({}, { $set: { active: false } });
+ 
 
         // active the logging user
         newUser.active = true;
@@ -228,6 +227,7 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json({ message: "server error" });
     }
 };
+
 
 
 
