@@ -11,6 +11,8 @@ router.use(protect);
 // Get all products
 router.get("/", productsController.getAllProducts);
 
+
+router.use(restrictTo("admin"));
 // Get product by ID
 router.get("/ProductByID/:id", productsController.getProductById);
 
@@ -18,7 +20,6 @@ router.get("/ProductByID/:id", productsController.getProductById);
 // ا
 router.get("/ProductSearch", productsController.filterProduct);
 
-router.use(restrictTo("admin"));
 // Create new product
 router.post("/", productsController.createProduct);
 
@@ -34,3 +35,4 @@ router.patch("/:id", productsController.updateProduct);
 router.delete("/:id", productsController.deleteProduct);
 
 module.exports = router;
+
