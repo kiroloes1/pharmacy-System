@@ -9,6 +9,7 @@ router.use(protect);
 // Get all customers
 router.get("/", customerController.getAllCustomers);
 
+router.use(restrictTo("admin"));
 // Get customer by ID
 router.get("/getCustomerByID/:id", customerController.getCustomerById);
 
@@ -17,7 +18,7 @@ router.get("/Customersearch",customerController.filterCustomer)
 
 
 
-router.use(restrictTo("admin"));
+
 // Create new customer
 router.post("/", customerController.CreateNewCustomer);
 
@@ -35,3 +36,4 @@ router.put("/addToCustomerBalance/:id", customerController.addToCustomerBalance)
 
 
 module.exports = router;
+
