@@ -5,6 +5,8 @@ const { protect, restrictTo } = require(`${__dirname}/../middleWare/authMiddlewa
 
 // أي حد عامل login يقدر يشوف البيانات
 router.use(protect);
+// اللي بعد كده admin فقط
+router.use(restrictTo("admin"));
 
 // GET all purchase returns
 router.get("/", invoiceReturn.getAllReturnInvoices);
@@ -12,10 +14,10 @@ router.get("/", invoiceReturn.getAllReturnInvoices);
 // GET purchase return by ID
 router.get("/:id", invoiceReturn.getReturnInvoiceById);
 
-// اللي بعد كده admin فقط
-router.use(restrictTo("admin"));
+
 
 // // DELETE purchase return by ID
 // router.delete("/:id", invoiceReturnModel.deletePurchaseReturn);
 
 module.exports = router;
+
