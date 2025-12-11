@@ -25,9 +25,9 @@ exports.protect = async (req, res, next) => {
     next();
   } catch (err) {
   if (err.name === "TokenExpiredError") {
-    return res.status(401).json({ message: "Token expired, please login again" });
+    return res.status(401).json({ message: "اانتهت صلاحيه الجلسه يجب عليك التسجيل من جديد" });
   }
-  return res.status(401).json({ message: "Invalid token" });
+  return res.status(401).json({ message: "انتهت صلاحيه الجلسه" });
 }
 };
 
@@ -37,11 +37,12 @@ exports.restrictTo = (...roles) => {
 
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
-        message: "You do not have permission to perform this action"
+        message: "لا يوجد لديك صلاحيات للوصول لهذه الصفحه"
       });
     }
 
     next();
   };
 };
+
 
