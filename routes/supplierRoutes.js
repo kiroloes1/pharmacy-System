@@ -5,7 +5,7 @@ const { protect, restrictTo } = require(`${__dirname}/../middleWare/authMiddlewa
 
 // أي حد عامل login يقدر يشوف البيانات
 router.use(protect);
-
+router.use(restrictTo("admin"));
 
 // Routes عامة
 router.get("/", supplierController.getAllSuppliers);
@@ -14,7 +14,7 @@ router.get("/filter/search", supplierController.FilterSupplier);
 
 
 // باقي العمليات Admin فقط
-router.use(restrictTo("admin"));
+
 router.post("/", supplierController.createNewSupplier);
 router.put("/:id", supplierController.updateSupplier);
 // router.delete("/:id", supplierController.deleteSupplier);
@@ -24,3 +24,4 @@ router.put("/addToSupplierBalance/:id", supplierController.addToSupplierBalance)
 
 
 module.exports = router;
+
