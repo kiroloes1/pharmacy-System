@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const userController = require(`${__dirname}/../controller/userController`);
-const {protect}=require(`${__dirname}/../middleWare/authMiddleware`);
+const {protect ,restrictTo }=require(`${__dirname}/../middleWare/authMiddleware`);
 
 
 const resetPassword = require(`${__dirname}/../resetPassword/resetPassword`);
@@ -38,6 +38,7 @@ router.delete("/:id", userController.deleteUser);
 
 
 module.exports = router;
+
 
 
 
