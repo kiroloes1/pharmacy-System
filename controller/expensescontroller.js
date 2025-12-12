@@ -4,7 +4,7 @@ const InvoiceModel = require(`${__dirname}/../Models/invoiceModel`);
 //  GET all expenses 
 exports.getAllExpenses = async (req, res) => {
   try {
-    const expenses = await Expense.find().populate("User", "name email"); // لو عندك اسم أو إيميل مستخدم
+    const expenses = await Expense.find().populate("User", "name email").sort({ _id: -1 }); // لو عندك اسم أو إيميل مستخدم
     res.status(200).json({
       message: "Success",
       results: expenses.length,
@@ -135,3 +135,4 @@ exports.profit = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
