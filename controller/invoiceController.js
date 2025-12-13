@@ -224,7 +224,8 @@ exports.returnInvoice = async (req, res) => {
 
     // 8) تحديث رصيد العميل
     await Customer.findByIdAndUpdate(invoice.customerId, {
-      $inc: { remainingBalance: -totalReturned }
+      $inc: { remainingBalance: -totalReturned },
+      $push: { invoicesReturn: returnInvoice._id }
     });
 
     // 9) إنشاء سجل الإرجاع
@@ -356,6 +357,7 @@ exports.benefit = async (req, res) => {
     });
   }
 };
+
 
 
 
