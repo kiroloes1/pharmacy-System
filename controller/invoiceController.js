@@ -219,6 +219,11 @@ exports.returnInvoice = async (req, res) => {
       invoice.totalAfterDiscount = 0;
       invoice.remaining = 0;
     }
+                // 8) تحديث رصيد العميل
+    await Customer.findByIdAndUpdate(invoice.customerId, {
+      $inc: { remainingBalance: -totalReturned },
+    });
+
 
     await invoice.save();
 
@@ -238,11 +243,6 @@ exports.returnInvoice = async (req, res) => {
       returnDate: new Date()
     });
 
-          // 8) تحديث رصيد العميل
-    await Customer.findByIdAndUpdate(invoice.customerId, {
-      $inc: { remainingBalance: -totalReturned },
-      $push: { invoicesReturn: returnInvoice._id }
-    });
 
     res.status(200).json({
       message: "Invoice returned successfully",
@@ -359,6 +359,7 @@ exports.benefit = async (req, res) => {
     });
   }
 };
+
 
 
 
