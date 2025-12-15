@@ -188,6 +188,9 @@ exports.BlockUser = async (req, res) => {
 
 
     user.blocked = !user.blocked;
+          if(user.blocked===true){
+      user.active=false;
+      }
 
 
     await user.save();
@@ -227,6 +230,7 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json({ message: "server error" });
     }
 };
+
 
 
 
