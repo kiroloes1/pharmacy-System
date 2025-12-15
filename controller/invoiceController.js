@@ -222,11 +222,7 @@ exports.returnInvoice = async (req, res) => {
 
     await invoice.save();
 
-    // 8) تحديث رصيد العميل
-    await Customer.findByIdAndUpdate(invoice.customerId, {
-      $inc: { remainingBalance: -totalReturned },
-      $push: { invoicesReturn: returnInvoice._id }
-    });
+
 
     // 9) إنشاء سجل الإرجاع
     const returnInvoice = await invoiceReturnModel.create({
@@ -240,6 +236,12 @@ exports.returnInvoice = async (req, res) => {
       totalReturned,
       reason: returnReason || "No reason provided",
       returnDate: new Date()
+    });
+
+          // 8) تحديث رصيد العميل
+    await Customer.findByIdAndUpdate(invoice.customerId, {
+      $inc: { remainingBalance: -totalReturned },
+      $push: { invoicesReturn: returnInvoice._id }
     });
 
     res.status(200).json({
@@ -357,6 +359,7 @@ exports.benefit = async (req, res) => {
     });
   }
 };
+
 
 
 
