@@ -11,6 +11,12 @@ exports.getAllCustomers = async (req, res) => {
         path: "products.productId",
         model: "Products"
         }
+    })  .populate({
+      path:"invoicesReturn",
+      populate:{
+        path:"products.productId",
+        model:"Products"
+      }
     })
 
 
@@ -270,6 +276,7 @@ exports.addToCustomerBalance = async (req, res) => {
 //         res.status(500).json({ message: "server error" });
 //     }
 // };
+
 
 
 
