@@ -17,7 +17,8 @@ router.get("/:id", invoiceReturn.getReturnInvoiceById);
 
 
 // // DELETE purchase return by ID
-// router.delete("/:id", invoiceReturnModel.deletePurchaseReturn);
+router.delete("/:id", invoiceReturnModel.deletePurchaseReturn);
 
 module.exports = router;
+
 
