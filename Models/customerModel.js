@@ -31,7 +31,12 @@ const customerSchema=new mongoose.Schema({
       type:String,
       default:"in"
     }
-
+,
+    invoicesReturn:[{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "InvoiceReturn",
+      default: []
+    }]
 
 
 });
