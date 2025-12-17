@@ -6,9 +6,9 @@ exports.getAllReturnInvoices = async (req, res) => {
     try {
         const returnInvoices = await invoiceReturnModel
             .find()
-            .populate("invoiceId","_id", "paymentMethod", "note","createdAt")
-            .populate("customerId","name", "phone","remainingBalance")
-            .populate("products.productId","name","sellPrice","purchasePrice","companyName", "quantity")
+            .populate("invoiceId")
+            .populate("customerId")
+            .populate("products.productId")
         .sort({ _id: -1 });
 
         return res.status(200).json({
@@ -30,9 +30,10 @@ exports.getReturnInvoiceById = async (req, res) => {
 
         const returnInvoice = await invoiceReturnModel
             .findById(id)
-           .populate("invoiceId","_id", "paymentMethod", "note","createdAt")
-            .populate("customerId","name", "phone","remainingBalance")
-            .populate("products.productId","name","sellPrice","purchasePrice","companyName", "quantity")
+             .populate("invoiceId")
+            .populate("customerId")
+            .populate("products.productId")
+       
 
         if (!returnInvoice) {
             return res.status(404).json({ message: "Return invoice not found" });
@@ -194,5 +195,6 @@ await Customer.findByIdAndUpdate(invoice.customerId, {
     });
   }
 };
+
 
 
