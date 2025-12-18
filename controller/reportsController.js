@@ -139,7 +139,7 @@ exports.yearlyReport = async (req, res) => {
 // MAIN DASHBOARD REPORT
 exports.reports = async (req, res) => {
   try {
-    const invoices = await InvoiceModel.find({});
+    const invoices = await InvoiceModel.find({return:false});
     const customers = await Customer.find({});
     const suppliers = await supplierModel.find({});
     const products = await ProductModel.find({});
@@ -199,5 +199,6 @@ exports.reports = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
 
 
