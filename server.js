@@ -5,7 +5,7 @@ const errorHandler = require("./middleWare/errorMiddleware");
 const mongodbConfig = require(`${__dirname}/config/config.js`);
 // const uploads=require(`${__dirname}/uploads`);
 
-app.use(express.static(path.join(__dirname,"public")))
+
 
 
 // start connect with mongo DB
@@ -53,6 +53,7 @@ app.use(errorHandler);
 app.listen(port, () => {
   console.log("Server running on port", port);
 });
+
 
 
 
