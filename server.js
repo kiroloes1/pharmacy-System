@@ -3,6 +3,9 @@ const app = express();
 const port = process.env.PORT || 8000;
 const errorHandler = require("./middleWare/errorMiddleware");
 const mongodbConfig = require(`${__dirname}/config/config.js`);
+const uploads=equire(`${__dirname}/uploads`);
+
+
 
 // start connect with mongo DB
 mongodbConfig();
@@ -27,6 +30,7 @@ const cors = require("cors");
 app.use(cors()); // يسمح لأي دومين
 
 app.use(express.json());
+app.use("/uploads" , express.static("uploads"));
 
 // use routes
 app.use("/v1/Customers", customerRouter);
@@ -48,6 +52,7 @@ app.use(errorHandler);
 app.listen(port, () => {
   console.log("Server running on port", port);
 });
+
 
 
 
