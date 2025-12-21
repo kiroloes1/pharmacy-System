@@ -3,7 +3,7 @@ const app = express();
 const port = process.env.PORT || 8000;
 const errorHandler = require("./middleWare/errorMiddleware");
 const mongodbConfig = require(`${__dirname}/config/config.js`);
-const uploads=equire(`${__dirname}/uploads`);
+const uploads=require(`${__dirname}/uploads`);
 
 
 
@@ -52,6 +52,7 @@ app.use(errorHandler);
 app.listen(port, () => {
   console.log("Server running on port", port);
 });
+
 
 
 
