@@ -18,7 +18,8 @@ const customerSchema=new mongoose.Schema({
       {
          amount: { type: Number, default:0 },
          typeCollection:{type:String, default:"in"},
-         date: { type: Date, default: Date.now }
+         date: { type: Date, default: Date.now },
+           note:{type:String ,default:"مفيش اي  ملاحظات "}
       }
       ]
       ,
@@ -45,4 +46,5 @@ const customer=mongoose.model("customer",customerSchema);
 
 
 module.exports=customer;
+
 
