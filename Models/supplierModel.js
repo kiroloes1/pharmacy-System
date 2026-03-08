@@ -22,7 +22,8 @@ const supplierSchema=new mongoose.Schema({
       payments: [
       {
          amount: { type: Number, default:0 },
-         date: { type: Date, default: Date.now }
+         date: { type: Date, default: Date.now },
+           note:{type:String ,default:"مفيش اي  ملاحظات "}
       }
       ]
       ,
@@ -37,5 +38,6 @@ const supplierSchema=new mongoose.Schema({
 const supplier=mongoose.model("supplier",supplierSchema);
 
 module.exports=supplier;
+
 
 
