@@ -158,7 +158,7 @@ exports.updateCustomer = async (req, res) => {
 exports.collection = async (req, res) => {
   try {
     const id = req.params.id;
-    let { collectionPaid, typeCollection } = req.body;
+    let { collectionPaid, typeCollection ,note} = req.body;
 
     if (collectionPaid <= 0) {
       return res.status(400).json({ message: "Please enter a valid amount" });
@@ -177,13 +177,13 @@ exports.collection = async (req, res) => {
       // صرف للعميل (مال خارج من النظام للعميل)
       await customersModel.findByIdAndUpdate(id, {
         $inc: { remainingBalance: collectionPaid },
-        $push: { payments: { amount: collectionPaid, typeCollection: "out", date: new Date() } }
+        $push: { payments: { amount: collectionPaid, typeCollection: "out", date: new Date(),note } }
       });
     } else {
       // قبض من العميل (مال وارد من العميل للنظام)
       await customersModel.findByIdAndUpdate(id, {
         $inc: { remainingBalance: -collectionPaid },
-        $push: { payments: { amount: collectionPaid, typeCollection: "in", date: new Date() } }
+        $push: { payments: { amount: collectionPaid, typeCollection: "in", date: new Date(),note } }
       });
 
       // تحديث كل الفواتير المفتوحة حسب المبلغ
@@ -276,6 +276,7 @@ exports.addToCustomerBalance = async (req, res) => {
 //         res.status(500).json({ message: "server error" });
 //     }
 // };
+
 
 
 
